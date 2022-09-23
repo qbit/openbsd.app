@@ -81,7 +81,6 @@ __DATA__
 	  %= csrf_field
 	  %= submit_button 'Search...'
         % end
-        </form>
       </div>
     </div>
     <hr />
