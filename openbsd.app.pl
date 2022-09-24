@@ -2,7 +2,7 @@ use feature 'switch';
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
 
-#helper unstable => sub { state $sql = Mojo::SQLite->new('sqlite:unstable.db') };
+helper unstable => sub { state $sql = Mojo::SQLite->new('sqlite:unstable.db') };
 helper stable => sub { state $sql = Mojo::SQLite->new('sqlite:stable.db') };
 
 my $query = q{
@@ -22,7 +22,7 @@ get '/' => sub ($c) {
 
     my $search = $c->param('search');
 
-    #my $unstable = $c->param('unstable');
+    my $unstable = $c->param('unstable');
     my $format = $c->param('format');
 
     if ( defined $search && $search ne "" ) {
@@ -32,7 +32,7 @@ get '/' => sub ($c) {
 
         my $db = $c->stable->db;
 
-        #$db = $c->unstable->db if defined $unstable;
+        $db = $c->unstable->db if defined $unstable;
 
         my $results = $db->query( $query, $search )->hashes;
 
@@ -123,6 +123,8 @@ __DATA__
       <div class="search">
         %= form_for '/' => begin
 	  %= text_field search => ""
+	  unstable
+	  %= check_box 'unstable'
 	  %= submit_button 'Search...'
         % end
       </div>
