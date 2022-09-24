@@ -71,6 +71,10 @@ __DATA__
         border-top:solid black 1px;
       }
 
+      th {
+        white-space: nowrap;
+      }
+
       .search {
         padding: 10px;
 	margin: 10px;
