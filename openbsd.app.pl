@@ -97,8 +97,9 @@ __DATA__
       }
 
       footer, .wrap, .results {
-        width: 100%;
 	text-align: center;
+        padding: 10px;
+        margin: 10px;
       }
     </style>
   </head>
