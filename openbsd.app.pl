@@ -1,6 +1,5 @@
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
-use Data::Dumper;
 
 #helper unstable => sub { state $sql = Mojo::SQLite->new('sqlite:unstable.db') };
 helper stable => sub { state $sql = Mojo::SQLite->new('sqlite:stable.db') };
@@ -18,18 +17,26 @@ my $query = q{
 };
 
 get '/' => sub ($c) {
-    my $v = $c->validation;
+    my $v      = $c->validation;
     my $search = $c->param('search');
+
     #my $unstable = $c->param('unstable');
 
     if ( defined $search && $search ne "" ) {
-	return $c->render(text => 'Bad CSRF token!', status => 403) if $v->csrf_protect->has_error('csrf_token');
+        return $c->render( text => 'Bad CSRF token!', status => 403 )
+          if $v->csrf_protect->has_error('csrf_token');
 
-	my $db = $c->stable->db;
-	#$db = $c->unstable->db if defined $unstable; 
+        my $db = $c->stable->db;
 
-	my $results = $db->query($query, $search)->hashes;
-        $c->render( template => 'results', search => $search, results => $results );
+        #$db = $c->unstable->db if defined $unstable;
+
+        my $results = $db->query( $query, $search )->hashes;
+
+        $c->render(
+            template => 'results',
+            search   => $search,
+            results  => $results
+        );
     }
     else {
         $c->render( template => 'index' );
@@ -51,25 +58,37 @@ __DATA__
         font-family: Avenir, 'Open Sans', sans-serif;
       }
 
-      th,
-      td {
-        border: 1px solid;
-	padding: 5px;
+      table {
+        border-collapse:separate;
+        border:solid black 1px;
+        border-radius:6px;
       }
       
-      table {
-        margin: 0 auto;
-        display: block;
-        overflow-x: auto;
-        border-spacing: 0;
+      td, th {
+        border-left:solid black 1px;
+        border-top:solid black 1px;
+      }
+      
+      th {
+        border-top: none;
+      }
+      
+      td:first-child, th:first-child {
+        border-left: none;
       }
 
-      .popup {
-        display: none;
+      td {
+	padding: 10px;
       }
 
-      .result:hover~.popup {
-        display: block;
+      .nowrap {
+        white-space: nowrap;
+      }
+
+      code {
+        background: #ccc;
+	padding: 3px;
+        border-radius:6px;
       }
     </style>
   </head>
@@ -94,7 +113,7 @@ __DATA__
 
 @@ results.html.ep
 % layout 'default';
-Found <%= @$results %> reslts for for '<%= $search %>':
+Found <%= @$results %> results for '<%= $search %>':
   <table>
     <thead>
       <tr>
@@ -105,8 +124,13 @@ Found <%= @$results %> reslts for for '<%= $search %>':
     </thead>
 % foreach my $result (@$results) {
     <tr>
-      <td><%= $result->{FULLPKGPATH} %></td>
-      <td><%== $result->{COMMENT_MATCH} %></td>
+      <td class="nowrap">
+        <div>
+	  <%= $result->{FULLPKGPATH} %><br />
+	  <code>pkg_add <%= $result->{FULLPKGNAME} %></code>
+	</div>
+      </td>
+      <td class="nowrap"><%== $result->{COMMENT_MATCH} %></td>
       <td><%== $result->{DESCR_MATCH} %></td>
     </tr>
 % }
