@@ -98,10 +98,6 @@ __DATA__
 
       footer, .wrap, .results {
 	text-align: center;
-        padding: 10px;
-	padding-top: 0px;
-	padding-bottom: 5px;
-        margin: 10px;
       }
     </style>
   </head>
