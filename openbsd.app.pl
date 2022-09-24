@@ -87,7 +87,7 @@ __DATA__
     <%== content %>
     <hr />
     <footer>
-    OpenBSD.app
+    <a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022
     </footer>
   </body>
 </html>
