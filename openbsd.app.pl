@@ -118,18 +118,15 @@ Found <%= @$results %> results for '<%= $search %>':
     <thead>
       <tr>
         <th>Path</th>
+        <th>Package Name</th>
 	<th>Comment</th>
 	<th>Description</th>
       </tr>
     </thead>
 % foreach my $result (@$results) {
     <tr>
-      <td class="nowrap">
-        <div>
-	  <%= $result->{FULLPKGPATH} %><br />
-	  <code>pkg_add <%= $result->{FULLPKGNAME} %></code>
-	</div>
-      </td>
+      <td class="nowrap"><%= $result->{FULLPKGPATH} %></td>
+      <td class="nowrap"><%= $result->{FULLPKGNAME} %></td>
       <td class="nowrap"><%== $result->{COMMENT_MATCH} %></td>
       <td><%== $result->{DESCR_MATCH} %></td>
     </tr>
