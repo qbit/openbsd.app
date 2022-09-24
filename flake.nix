@@ -40,7 +40,7 @@
               PS1='\u@\h:\@; '
               echo "Perl `${pkgs.perl}/bin/perl --version`"
             '';
-            buildInputs = with pkgs.perlPackages; [ PerlTidy ];
+            buildInputs = with pkgs.perlPackages; [ PerlTidy pkgs.sqlite ];
             nativeBuildInputs = with pkgs.perlPackages; [
               perl
               Mojolicious
