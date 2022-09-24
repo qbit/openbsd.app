@@ -1,3 +1,4 @@
+use feature 'switch';
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
 
@@ -17,13 +18,16 @@ my $query = q{
 };
 
 get '/' => sub ($c) {
-    my $v      = $c->validation;
+    my $v = $c->validation;
+
     my $search = $c->param('search');
 
     #my $unstable = $c->param('unstable');
+    my $format = $c->param('format');
 
     if ( defined $search && $search ne "" ) {
-	#return $c->render( text => 'Bad CSRF token!', status => 403 )
+
+        #return $c->render( text => 'Bad CSRF token!', status => 403 )
         #  if $v->csrf_protect->has_error('csrf_token');
 
         my $db = $c->stable->db;
@@ -32,11 +36,18 @@ get '/' => sub ($c) {
 
         my $results = $db->query( $query, $search )->hashes;
 
-        $c->render(
-            template => 'results',
-            search   => $search,
-            results  => $results
-        );
+        given ($format) {
+            when ("json") {
+                $c->render( json => $results );
+            }
+            default {
+                $c->render(
+                    template => 'results',
+                    search   => $search,
+                    results  => $results
+                );
+            }
+        }
     }
     else {
         $c->render( template => 'index' );
@@ -108,6 +119,7 @@ __DATA__
   </head>
   <body>
     <div class="wrap">
+      <h3><a href="/">OpenBSD.app - search packages</a></h3>
       <div class="search">
         %= form_for '/' => begin
 	  %= text_field search => ""
@@ -120,14 +132,18 @@ __DATA__
     </div>
     <hr />
     <footer>
-      <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022
+      <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022</p>
+      <p><a href="https://github.com/qbit/pkg">Prefer CLI?</a></p>
     </footer>
   </body>
 </html>
 
 @@ results.html.ep
 % layout 'default';
-<p>Found <b><%= @$results %></b> results for '<b><%= $search %></b>'</p>
+<p>
+  Found <b><%= @$results %></b> results for '<b><%= $search %></b>'<br />
+  <a href="/?search=<%= $search %>&format=json">View as JSON</a>
+</p>
   <table class="results">
     <thead>
       <tr>
