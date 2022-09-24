@@ -56,21 +56,31 @@ __DATA__
     <style>
       body {
         font-family: Avenir, 'Open Sans', sans-serif;
+	background-color: #ffffea;
       }
 
       table {
         border-collapse:separate;
         border:solid black 1px;
         border-radius:6px;
+	background-color: #fff;
       }
       
       td, th {
         border-left:solid black 1px;
         border-top:solid black 1px;
       }
+
+      .search {
+        padding: 10px;
+	margin: 10px;
+        border-radius:6px;
+	box-shadow: 2px 2px 2px black;
+      }
       
-      th {
+      th, .search {
         border-top: none;
+	background-color: #eaeaff;
       }
       
       td:first-child, th:first-child {
@@ -79,16 +89,16 @@ __DATA__
 
       td {
 	padding: 10px;
+	text-align: left;
       }
 
       .nowrap {
         white-space: nowrap;
       }
 
-      code {
-        background: #ccc;
-	padding: 3px;
-        border-radius:6px;
+      footer, .wrap, .results {
+        width: 100%;
+	text-align: center;
       }
     </style>
   </head>
@@ -103,30 +113,32 @@ __DATA__
       </div>
     </div>
     <hr />
-    <%== content %>
+    <div class="results">
+      <%== content %>
+    </div>
     <hr />
     <footer>
-    <a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022
+      <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022
     </footer>
   </body>
 </html>
 
 @@ results.html.ep
 % layout 'default';
-Found <%= @$results %> results for '<%= $search %>':
-  <table>
+<p>Found <b><%= @$results %></b> results for '<b><%= $search %></b>'</p>
+  <table class="results">
     <thead>
       <tr>
-        <th>Path</th>
         <th>Package Name</th>
+        <th>Path</th>
 	<th>Comment</th>
 	<th>Description</th>
       </tr>
     </thead>
 % foreach my $result (@$results) {
     <tr>
-      <td class="nowrap"><%= $result->{FULLPKGPATH} %></td>
       <td class="nowrap"><%= $result->{FULLPKGNAME} %></td>
+      <td class="nowrap"><%= $result->{FULLPKGPATH} %></td>
       <td class="nowrap"><%== $result->{COMMENT_MATCH} %></td>
       <td><%== $result->{DESCR_MATCH} %></td>
     </tr>
