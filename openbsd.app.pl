@@ -23,8 +23,8 @@ get '/' => sub ($c) {
     #my $unstable = $c->param('unstable');
 
     if ( defined $search && $search ne "" ) {
-        return $c->render( text => 'Bad CSRF token!', status => 403 )
-          if $v->csrf_protect->has_error('csrf_token');
+	#return $c->render( text => 'Bad CSRF token!', status => 403 )
+        #  if $v->csrf_protect->has_error('csrf_token');
 
         my $db = $c->stable->db;
 
@@ -107,7 +107,6 @@ __DATA__
       <div class="search">
         %= form_for '/' => begin
 	  %= text_field search => ""
-	  %= csrf_field
 	  %= submit_button 'Search...'
         % end
       </div>
