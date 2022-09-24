@@ -73,6 +73,7 @@ __DATA__
 
       th {
         white-space: nowrap;
+	padding: 6px;
       }
 
       .search {
