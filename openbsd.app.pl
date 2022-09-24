@@ -123,7 +123,7 @@ __DATA__
       <div class="search">
         %= form_for '/' => begin
 	  %= text_field search => ""
-	  unstable
+	  -current
 	  %= check_box 'unstable'
 	  %= submit_button 'Search...'
         % end
