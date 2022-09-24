@@ -167,4 +167,4 @@ __DATA__
 
 @@ index.html.ep
 % layout 'default';
-Welcome!
+Welcome! Default search queries OpenBSD 7.2 package sets. You can search -current (packages from 2022-09-23) by toggling the '-current' checkbox.
