@@ -1,9 +1,28 @@
+use warnings;
+use strict;
 use feature 'switch';
+
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
 
-helper unstable => sub { state $sql = Mojo::SQLite->new('sqlite:unstable.db') };
-helper stable => sub { state $sql = Mojo::SQLite->new('sqlite:stable.db') };
+if ( $^O eq "openbsd" ) {
+    require OpenBSD::Pledge;
+    require OpenBSD::Unveil;
+
+    OpenBSD::Unveil::unveil( "/",            "" )  or die;
+    OpenBSD::Unveil::unveil( "./current.db", "r" ) or die;
+    OpenBSD::Unveil::unveil( "./stable.db",  "r" ) or die;
+    OpenBSD::Unveil::unveil( "/usr/local",   "r" ) or die;
+
+    # Needed to create the -shm and -wal db files.
+    OpenBSD::Unveil::unveil( ".", "rwc" ) or die;
+
+    OpenBSD::Pledge::pledge(qw( stdio dns inet rpath proc flock wpath cpath ))
+      or die;
+}
+
+helper current => sub { state $sql = Mojo::SQLite->new('sqlite:current.db') };
+helper stable  => sub { state $sql = Mojo::SQLite->new('sqlite:stable.db') };
 
 my $query = q{
     SELECT
@@ -22,8 +41,8 @@ get '/' => sub ($c) {
 
     my $search = $c->param('search');
 
-    my $unstable = $c->param('unstable');
-    my $format = $c->param('format');
+    my $current = $c->param('current');
+    my $format  = $c->param('format');
 
     if ( defined $search && $search ne "" ) {
 
@@ -32,7 +51,7 @@ get '/' => sub ($c) {
 
         my $db = $c->stable->db;
 
-        $db = $c->unstable->db if defined $unstable;
+        $db = $c->current->db if defined $current;
 
         my $results = $db->query( $query, $search )->hashes;
 
@@ -124,7 +143,7 @@ __DATA__
         %= form_for '/' => begin
 	  %= text_field search => ""
 	  -current
-	  %= check_box 'unstable'
+	  %= check_box 'current'
 	  %= submit_button 'Search...'
         % end
       </div>
