@@ -98,6 +98,7 @@ __DATA__
     <link
       rel="search"
       type="application/opensearchdescription+xml"
+      title="<% = $title %>"
       href="/openbsd-app-opensearch.xml" />
     <style>
       body {
