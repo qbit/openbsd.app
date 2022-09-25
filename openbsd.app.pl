@@ -205,12 +205,13 @@ __DATA__
 Welcome! Default search queries OpenBSD 7.2 package sets. You can search -current (packages from 2022-09-23) by toggling the '-current' checkbox.
 
 @@ openbsd-app-opensearch.xml.ep
+<?xml version="1.0" encoding="utf-8"?>
 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
                        xmlns:moz="http://www.mozilla.org/2006/browser/search/">
   <ShortName><%= $title %></ShortName>
   <Description><%= $descr %></Description>
   <InputEncoding>UTF-8</InputEncoding>
   <Image width="32" height="32" type="image/x-icon">https://openbsd.org/favicon.ico</Image>
-  <Url type="text/html" template="https://openbsd.app/?search={searchTerms}"/>
+  <Url type="text/html" method="GET" template="https://openbsd.app/?search={searchTerms}"/>
   <moz:SearchForm>https://openbsd.app/</moz:SearchForm>
 </OpenSearchDescription>
