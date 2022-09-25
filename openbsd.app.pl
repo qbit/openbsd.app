@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+
 use feature 'switch';
 
 use Mojolicious::Lite -signatures;
@@ -37,7 +38,7 @@ my $query = q{
 };
 
 my $title = "OpenBSD.app";
-my $descr = "Search the OpenBSD stable packages.";
+my $descr = "OpenBSD package search";
 
 get '/' => sub ($c) {
     my $v = $c->validation;
@@ -47,13 +48,11 @@ get '/' => sub ($c) {
     my $current = $c->param('current');
     my $format  = $c->param('format');
 
+    $c->stash( title => $title );
+    $c->stash( descr => $descr );
+
     if ( defined $search && $search ne "" ) {
-
-        #return $c->render( text => 'Bad CSRF token!', status => 403 )
-        #  if $v->csrf_protect->has_error('csrf_token');
-
         my $db = $c->stable->db;
-
         $db = $c->current->db if defined $current;
 
         my $results = $db->query( $query, $search )->hashes;
@@ -66,8 +65,7 @@ get '/' => sub ($c) {
                 $c->render(
                     template => 'results',
                     search   => $search,
-                    results  => $results,
-                    title    => $title
+                    results  => $results
                 );
             }
         }
@@ -78,6 +76,7 @@ get '/' => sub ($c) {
 };
 
 get '/openbsd-app-opensearch.xml' => sub ($c) {
+    $c->res->headers->content_type('application/opensearchdescription+xml');
     $c->render(
         template => 'openbsd-app-opensearch',
         format   => 'xml',
@@ -95,7 +94,7 @@ __DATA__
     <title><%= $title %></title>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description" content="OpenBSD package search">
+    <meta name="description" content="<%= $descr %>">
     <link
       rel="search"
       type="application/opensearchdescription+xml"
