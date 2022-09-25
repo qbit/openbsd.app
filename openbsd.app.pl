@@ -36,6 +36,9 @@ my $query = q{
     WHERE ports_fts MATCH ? ORDER BY rank;
 };
 
+my $title = "OpenBSD.app";
+my $descr = "Search the OpenBSD stable packages.";
+
 get '/' => sub ($c) {
     my $v = $c->validation;
 
@@ -63,7 +66,8 @@ get '/' => sub ($c) {
                 $c->render(
                     template => 'results',
                     search   => $search,
-                    results  => $results
+                    results  => $results,
+                    title    => $title
                 );
             }
         }
@@ -73,16 +77,29 @@ get '/' => sub ($c) {
     }
 };
 
+get '/openbsd-app-opensearch.xml' => sub ($c) {
+    $c->render(
+        template => 'openbsd-app-opensearch',
+        format   => 'xml',
+        title    => $title,
+        descr    => $descr
+    );
+};
+
 app->start;
 __DATA__
 @@ layouts/default.html.ep
 <!doctype html>
 <html class="no-js" lang="">
   <head>
-    <title>OpenBSD.app</title>
+    <title><%= $title %></title>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="OpenBSD package search">
+    <link
+      rel="search"
+      type="application/opensearchdescription+xml"
+      href="/openbsd-app-opensearch.xml" />
     <style>
       body {
         font-family: Avenir, 'Open Sans', sans-serif;
@@ -187,3 +204,14 @@ __DATA__
 @@ index.html.ep
 % layout 'default';
 Welcome! Default search queries OpenBSD 7.2 package sets. You can search -current (packages from 2022-09-23) by toggling the '-current' checkbox.
+
+@@ openbsd-app-opensearch.xml.ep
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName><%= $title %></ShortName>
+  <Description><%= $descr %></Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="32" height="32" type="image/x-icon">https://openbsd.org/favicon.ico</Image>
+  <Url type="text/html" template="https://openbsd.app/?search={searchTerms}"/>
+  <moz:SearchForm>https://openbsd.app/</moz:SearchForm>
+</OpenSearchDescription>
