@@ -22,8 +22,14 @@ if ( $^O eq "openbsd" ) {
       or die;
 }
 
-helper current => sub { state $sql = Mojo::SQLite->new('sqlite:current.db') };
-helper stable  => sub { state $sql = Mojo::SQLite->new('sqlite:stable.db') };
+my $currentDB = "current.db";
+my $stableDB = "stable.db";
+
+my $mtime = (stat($currentDB))[9];
+$mtime = scalar localtime $mtime;
+
+helper current => sub { state $sql = Mojo::SQLite->new("sqlite:current.db") };
+helper stable  => sub { state $sql = Mojo::SQLite->new("sqlite:stable.db") };
 
 my $query = q{
     SELECT
@@ -50,6 +56,7 @@ get '/' => sub ($c) {
 
     $c->stash( title => $title );
     $c->stash( descr => $descr );
+    $c->stash( mtime => $mtime );
 
     if ( defined $search && $search ne "" ) {
         my $db = $c->stable->db;
@@ -203,7 +210,7 @@ __DATA__
 
 @@ index.html.ep
 % layout 'default';
-Welcome! Default search queries OpenBSD 7.2 package sets. You can search -current (packages from 2022-09-23) by toggling the '-current' checkbox.
+Welcome! Default search queries OpenBSD 7.2 package sets. You can search -current packages (from <i><%= $mtime %></i>) by toggling the '-current' checkbox.
 
 @@ openbsd-app-opensearch.xml.ep
 <?xml version="1.0" encoding="utf-8"?>
