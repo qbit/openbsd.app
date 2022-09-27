@@ -6,13 +6,16 @@ use feature 'switch';
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
 
+my $currentDB = "current.db";
+my $stableDB = "stable.db";
+
 if ( $^O eq "openbsd" ) {
     require OpenBSD::Pledge;
     require OpenBSD::Unveil;
 
     OpenBSD::Unveil::unveil( "/",            "" )  or die;
-    OpenBSD::Unveil::unveil( "./current.db", "r" ) or die;
-    OpenBSD::Unveil::unveil( "./stable.db",  "r" ) or die;
+    OpenBSD::Unveil::unveil( "./$currentDB", "r" ) or die;
+    OpenBSD::Unveil::unveil( "./$stableDB",  "r" ) or die;
     OpenBSD::Unveil::unveil( "/usr/local",   "r" ) or die;
 
     # Needed to create the -shm and -wal db files.
@@ -22,14 +25,11 @@ if ( $^O eq "openbsd" ) {
       or die;
 }
 
-my $currentDB = "current.db";
-my $stableDB = "stable.db";
-
 my $mtime = (stat($currentDB))[9];
 $mtime = scalar localtime $mtime;
 
-helper current => sub { state $sql = Mojo::SQLite->new("sqlite:current.db") };
-helper stable  => sub { state $sql = Mojo::SQLite->new("sqlite:stable.db") };
+helper current => sub { state $sql = Mojo::SQLite->new("sqlite:$currentDB") };
+helper stable  => sub { state $sql = Mojo::SQLite->new("sqlite:$stableDB") };
 
 my $query = q{
     SELECT
