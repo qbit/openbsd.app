@@ -1,13 +1,17 @@
+#!/usr/bin/env perl
+
 use warnings;
 use strict;
+use Time::HiRes qw( time );
 
 use feature 'switch';
 
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
+use Text::Markdown qw{ markdown };
 
 my $currentDB = "current.db";
-my $stableDB = "stable.db";
+my $stableDB  = "stable.db";
 
 if ( $^O eq "openbsd" ) {
     require OpenBSD::Pledge;
@@ -25,7 +29,7 @@ if ( $^O eq "openbsd" ) {
       or die;
 }
 
-my $mtime = (stat($currentDB))[9];
+my $mtime = ( stat($currentDB) )[9];
 $mtime = scalar localtime $mtime;
 
 helper current => sub { state $sql = Mojo::SQLite->new("sqlite:$currentDB") };
@@ -37,14 +41,22 @@ my $query = q{
 	FULLPKGPATH,
 	COMMENT,
 	DESCRIPTION,
-	highlight(ports_fts, 2, '<b>', '</b>') AS COMMENT_MATCH,
-	highlight(ports_fts, 3, '<b>', '</b>') AS DESCR_MATCH
+	highlight(ports_fts, 2, '**', '**') AS COMMENT_MATCH,
+	highlight(ports_fts, 3, '**', '**') AS DESCR_MATCH
     FROM ports_fts
     WHERE ports_fts MATCH ? ORDER BY rank;
 };
 
 my $title = "OpenBSD.app";
 my $descr = "OpenBSD package search";
+
+sub to_md ($results) {
+    foreach my $result (@$results) {
+        $result->{DESCR_MATCH}   = markdown( $result->{DESCR_MATCH} );
+        $result->{COMMENT_MATCH} = markdown( $result->{COMMENT_MATCH} );
+    }
+
+}
 
 get '/' => sub ($c) {
     my $v = $c->validation;
@@ -62,7 +74,12 @@ get '/' => sub ($c) {
         my $db = $c->stable->db;
         $db = $c->current->db if defined $current;
 
+        my $start   = time();
         my $results = $db->query( $query, $search )->hashes;
+        my $end     = time();
+        my $elapsed = sprintf( "%2f\n", $end - $start );
+
+        to_md($results);
 
         given ($format) {
             when ("json") {
@@ -72,6 +89,7 @@ get '/' => sub ($c) {
                 $c->render(
                     template => 'results',
                     search   => $search,
+                    elapsed  => $elapsed,
                     results  => $results
                 );
             }
@@ -186,7 +204,7 @@ __DATA__
 @@ results.html.ep
 % layout 'default';
 <p>
-  Found <b><%= @$results %></b> results for '<b><%= $search %></b>'<br />
+  Found <b><%= @$results %></b> results for '<b><%= $search %></b>' in <%= $elapsed %> seconds.<br />
   <a href="/?search=<%= $search %>&format=json">View as JSON</a>
 </p>
   <table class="results">

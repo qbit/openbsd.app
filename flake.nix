@@ -21,6 +21,7 @@
               perl
               Mojolicious
               MojoSQLite
+              TextMarkdown
               pkgs.minisign
             ];
             buildInputs = with pkgs; [ perl ];
@@ -46,6 +47,7 @@
               perl
               Mojolicious
               MojoSQLite
+              TextMarkdown
               pkgs.minisign
             ];
           };
