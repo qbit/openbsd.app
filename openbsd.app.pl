@@ -62,6 +62,7 @@ get '/' => sub ($c) {
     my $v = $c->validation;
 
     my $search = $c->param('search');
+    $search =~ s/[^[:ascii:]]//g;
 
     my $current = $c->param('current');
     my $format  = $c->param('format');
@@ -228,7 +229,8 @@ __DATA__
 
 @@ index.html.ep
 % layout 'default';
-Welcome! Default search queries OpenBSD 7.2 package sets. You can search -current packages (from <i><%= $mtime %></i>) by toggling the '-current' checkbox.
+<p>Welcome! Default search queries OpenBSD 7.2 package sets. You can search -current packages (from <i><%= $mtime %></i>) by toggling the '-current' checkbox.</p>
+<p>Search syntax is limited to <a href="https://www.sqlite.org/fts5.html">SQLite's FTS5 syntax</a>. for now.</p>
 
 @@ openbsd-app-opensearch.xml.ep
 <?xml version="1.0" encoding="utf-8"?>
