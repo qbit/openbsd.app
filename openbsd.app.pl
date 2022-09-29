@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
 
+# vim: set ts=4 sw=4 tw=0:
+# vim: set expandtab:
+
 use warnings;
 use strict;
 use Time::HiRes qw( time );
@@ -10,17 +13,15 @@ use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
 use Text::Markdown qw{ markdown };
 
-my $currentDB = "current.db";
-my $stableDB  = "stable.db";
+my $dbFile = "combined.db";
 
 if ( $^O eq "openbsd" ) {
     require OpenBSD::Pledge;
     require OpenBSD::Unveil;
 
-    OpenBSD::Unveil::unveil( "/",            "" )  or die;
-    OpenBSD::Unveil::unveil( "./$currentDB", "r" ) or die;
-    OpenBSD::Unveil::unveil( "./$stableDB",  "r" ) or die;
-    OpenBSD::Unveil::unveil( "/usr/local",   "r" ) or die;
+    OpenBSD::Unveil::unveil( "/",          "" )  or die;
+    OpenBSD::Unveil::unveil( "./$dbFile",  "r" ) or die;
+    OpenBSD::Unveil::unveil( "/usr/local", "r" ) or die;
 
     # Needed to create the -shm and -wal db files.
     OpenBSD::Unveil::unveil( ".", "rwc" ) or die;
@@ -29,22 +30,31 @@ if ( $^O eq "openbsd" ) {
       or die;
 }
 
-my $mtime = ( stat($currentDB) )[9];
+my $mtime = ( stat($dbFile) )[9];
 $mtime = scalar localtime $mtime;
 
-helper current => sub { state $sql = Mojo::SQLite->new("sqlite:$currentDB") };
-helper stable  => sub { state $sql = Mojo::SQLite->new("sqlite:$stableDB") };
+helper sqlite => sub {
+    state $sql = Mojo::SQLite->new("sqlite:$dbFile");
+    $sql->on(
+        connection => sub {
+            my ( $sql, $dbh ) = @_;
+            my $sqlite_mode = 'DELETE';
+            $dbh->do("pragma journal_mode=$sqlite_mode");
+        }
+    );
+    return $sql;
+};
 
 my $query = q{
     SELECT
-	FULLPKGNAME,
-	FULLPKGPATH,
-	COMMENT,
-	DESCRIPTION,
-	highlight(ports_fts, 2, '**', '**') AS COMMENT_MATCH,
-	highlight(ports_fts, 3, '**', '**') AS DESCR_MATCH
-    FROM ports_fts
-    WHERE ports_fts MATCH ? ORDER BY rank;
+	  FULLPKGNAME,
+	  FULLPKGPATH,
+	  COMMENT,
+	  DESCRIPTION,
+	  highlight(%s, 2, '**', '**') AS COMMENT_MATCH,
+	  highlight(%s, 3, '**', '**') AS DESCR_MATCH
+    FROM %s
+    WHERE %s MATCH ? ORDER BY rank;
 };
 
 my $title = "OpenBSD.app";
@@ -56,6 +66,14 @@ sub to_md ($results) {
         $result->{COMMENT_MATCH} = markdown( $result->{COMMENT_MATCH} );
     }
 
+}
+
+sub set_query ($is_current) {
+    if ($is_current) {
+        return sprintf( $query, ("current_ports_fts") x 4 );
+    }
+
+    return sprintf( $query, ("stable_ports_fts") x 4 );
 }
 
 get '/' => sub ($c) {
@@ -72,11 +90,11 @@ get '/' => sub ($c) {
     $c->stash( mtime => $mtime );
 
     if ( defined $search && $search ne "" ) {
-        my $db = $c->stable->db;
-        $db = $c->current->db if defined $current;
+        my $db = $c->sqlite->db;
 
+        my $q       = set_query( defined $current );
         my $start   = time();
-        my $results = $db->query( $query, $search )->hashes;
+        my $results = $db->query( $q, $search )->hashes;
         my $end     = time();
         my $elapsed = sprintf( "%2f\n", $end - $start );
 
