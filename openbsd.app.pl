@@ -6,6 +6,7 @@
 use warnings;
 use strict;
 use Time::HiRes qw( time );
+use File::Basename;
 
 use feature 'switch';
 
@@ -19,11 +20,10 @@ if ( $^O eq "openbsd" ) {
     require OpenBSD::Pledge;
     require OpenBSD::Unveil;
 
-    OpenBSD::Unveil::unveil( "/",               "" )    or die;
-    OpenBSD::Unveil::unveil( "./$dbFile",       "r" )   or die;
-    OpenBSD::Unveil::unveil( "./$(dbFile}-shm", "rwc" ) or die;
-    OpenBSD::Unveil::unveil( "./$(dbFile}-wal", "rwc" ) or die;
-    OpenBSD::Unveil::unveil( "/usr/local",      "r" )   or die;
+    OpenBSD::Unveil::unveil( "/",          "" )    or die;
+    OpenBSD::Unveil::unveil( $0,           "r" )   or die;
+    OpenBSD::Unveil::unveil( dirname($0),  "rwc" ) or die;
+    OpenBSD::Unveil::unveil( "/usr/local", "r" )   or die;
 
     OpenBSD::Pledge::pledge(qw( stdio dns inet rpath proc flock wpath cpath ))
       or die;
