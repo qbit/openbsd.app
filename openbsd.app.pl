@@ -213,7 +213,7 @@ __DATA__
     </div>
     <hr />
     <footer>
-      <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022</p>
+      <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022 - proudly hosted on <a href="https://openbsd.amsterdam/">obsd.ams</a>!</p>
       <p><a href="https://github.com/qbit/pkg">Prefer CLI?</a></p>
     </footer>
   </body>
