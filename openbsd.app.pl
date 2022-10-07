@@ -201,7 +201,7 @@ __DATA__
         border-radius:6px;
         background-color: #fff;
       }
-      
+
       td, th {
         border-left:solid black 1px;
         border-top:solid black 1px;
@@ -218,12 +218,12 @@ __DATA__
         border-radius:6px;
         box-shadow: 2px 2px 2px black;
       }
-      
+
       th, .search {
         border-top: none;
         background-color: #eaeaff;
       }
-      
+
       td:first-child, th:first-child {
         border-left: none;
       }
@@ -275,7 +275,7 @@ __DATA__
 @@ tree.html.ep
 % layout 'default';
 <div>
-  <h3>Dependency tree for: <%= $name %></h3> 
+  <h3>Dependency tree for: <%= $name %></h3>
   <p>
     <pre><%= $tree %></pre>
   </p>
