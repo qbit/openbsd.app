@@ -113,12 +113,19 @@ get '/tree' => sub ($c) {
     $c->stash( mtime => $mtime );
 
     my $search = $c->param('name');
+    my $raw    = $c->param('raw');
     my $db     = $c->sqlports->db;
-    $c->render(
-        template => 'tree',
-        name     => $search,
-        tree     => $db->query( $depsQuery, $search )->text
-    );
+
+    if ( $raw ne "" ) {
+        $c->render( text => $db->query( $depsQuery, $search )->text );
+    }
+    else {
+        $c->render(
+            template => 'tree',
+            name     => $search,
+            tree     => $db->query( $depsQuery, $search )->text
+        );
+    }
 };
 
 get '/' => sub ($c) {
