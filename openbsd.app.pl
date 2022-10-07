@@ -33,12 +33,25 @@ my $mtime = ( stat($dbFile) )[9];
 $mtime = scalar localtime $mtime;
 
 helper sqlite => sub {
-    state $sql = Mojo::SQLite->new("sqlite:$dbFile");
+    state $sql = Mojo::SQLite->new;
+    $sql->from_filename( $dbFile, { ReadOnly => 1, no_wal => 1 } );
     $sql->on(
         connection => sub {
             my ( $sql, $dbh ) = @_;
-            my $sqlite_mode = 'DELETE';
-            $dbh->do("pragma journal_mode=$sqlite_mode");
+            $dbh->do("pragma journal_mode=DELETE");
+        }
+    );
+    return $sql;
+};
+
+helper sqlports => sub {
+    state $sql = Mojo::SQLite->new;
+    $sql->from_filename( "/usr/local/share/sqlports",
+        { ReadOnly => 1, no_wal => 1 } );
+    $sql->on(
+        connection => sub {
+            my ( $sql, $dbh ) = @_;
+            $dbh->do("pragma journal_mode=DELETE");
         }
     );
     return $sql;
@@ -54,6 +67,23 @@ my $query = q{
 	  highlight(%s, 3, '**', '**') AS DESCR_MATCH
     FROM %s
     WHERE %s MATCH ? ORDER BY rank;
+};
+
+my $depsQuery = q{
+  WITH RECURSIVE
+  under_port(name,level) AS (
+    VALUES(? ,0)
+    UNION ALL
+    SELECT _depends.fulldepends, under_port.level+1
+      FROM
+        _depends
+      JOIN _paths ON _paths.id=_depends.fullpkgpath
+      join under_port ON _paths.fullpkgpath = under_port.name
+      where
+        _depends.type IN (0, 1)
+     ORDER BY 2 DESC
+  )
+SELECT substr('..........',1,level*3) || name FROM under_port;
 };
 
 my $title = "OpenBSD.app";
@@ -74,6 +104,22 @@ sub set_query ($is_current) {
 
     return sprintf( $query, ("stable_ports_fts") x 4 );
 }
+
+get '/tree' => sub ($c) {
+    my $v = $c->validation;
+
+    $c->stash( title => $title );
+    $c->stash( descr => $descr );
+    $c->stash( mtime => $mtime );
+
+    my $search = $c->param('name');
+    my $db     = $c->sqlports->db;
+    $c->render(
+        template => 'tree',
+        name     => $search,
+        tree     => $db->query( $depsQuery, $search )->text
+    );
+};
 
 get '/' => sub ($c) {
     my $v = $c->validation;
@@ -146,14 +192,14 @@ __DATA__
     <style>
       body {
         font-family: Avenir, 'Open Sans', sans-serif;
-	background-color: #ffffea;
+        background-color: #ffffea;
       }
 
       table {
         border-collapse:separate;
         border:solid black 1px;
         border-radius:6px;
-	background-color: #fff;
+        background-color: #fff;
       }
       
       td, th {
@@ -163,19 +209,19 @@ __DATA__
 
       th {
         white-space: nowrap;
-	padding: 6px;
+        padding: 6px;
       }
 
       .search {
         padding: 10px;
-	margin: 10px;
+        margin: 10px;
         border-radius:6px;
-	box-shadow: 2px 2px 2px black;
+        box-shadow: 2px 2px 2px black;
       }
       
       th, .search {
         border-top: none;
-	background-color: #eaeaff;
+        background-color: #eaeaff;
       }
       
       td:first-child, th:first-child {
@@ -183,8 +229,15 @@ __DATA__
       }
 
       td {
-	padding: 10px;
-	text-align: left;
+        padding: 10px;
+        text-align: left;
+      }
+
+      .tree {
+      }
+
+      pre {
+        text-align: left;
       }
 
       .nowrap {
@@ -192,7 +245,7 @@ __DATA__
       }
 
       footer, .wrap, .results {
-	text-align: center;
+        text-align: center;
       }
     </style>
   </head>
@@ -218,6 +271,15 @@ __DATA__
     </footer>
   </body>
 </html>
+
+@@ tree.html.ep
+% layout 'default';
+<div>
+  <h3>Dependency tree for: <%= $name %></h3> 
+  <p>
+    <pre><%= $tree %></pre>
+  </p>
+</div>
 
 @@ results.html.ep
 % layout 'default';
