@@ -105,6 +105,13 @@ sub set_query ($is_current) {
     return sprintf( $query, ("stable_ports_fts") x 4 );
 }
 
+sub fix_fts ($s) {
+    return "" unless defined $s;
+    $s =~ s/[^\w]/ /g;
+    return $s;
+}
+
+
 get '/tree' => sub ($c) {
     my $v = $c->validation;
 
@@ -131,8 +138,7 @@ get '/tree' => sub ($c) {
 get '/' => sub ($c) {
     my $v = $c->validation;
 
-    my $search = $c->param('search');
-    $search =~ s/[^[:ascii:]]//g;
+    my $search = fix_fts $c->param('search');
 
     my $current = $c->param('current');
     my $format  = $c->param('format');
