@@ -108,6 +108,8 @@ sub set_query ($is_current) {
 sub fix_fts ($s) {
     return "" unless defined $s;
     $s =~ s/[^\w]/ /g;
+    $s =~ s/^\s+//g;
+    $s =~ s/\s+$//g;
     return $s;
 }
 
