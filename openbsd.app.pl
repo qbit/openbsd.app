@@ -312,7 +312,12 @@ __DATA__
 % foreach my $result (@$results) {
     <tr>
       <td class="nowrap"><%= $result->{FULLPKGNAME} %></td>
-      <td class="nowrap"><%= $result->{FULLPKGPATH} %></td>
+      <td class="nowrap">
+        <a
+          href="/tree?name=<%= $result->{FULLPKGPATH} %>"
+          title="Dependencies for <%= $result->{FULLPKGNAME} %>"
+        ><%= $result->{FULLPKGPATH} %></a>
+      </td>
       <td class="nowrap"><%== $result->{COMMENT_MATCH} %></td>
       <td><%== $result->{DESCR_MATCH} %></td>
     </tr>
