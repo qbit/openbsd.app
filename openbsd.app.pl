@@ -324,6 +324,10 @@ __DATA__
 <p>Welcome! Default search queries OpenBSD 7.2 package sets. You can search -current packages (from <i><%= $mtime %></i>) by toggling the '-current' checkbox.</p>
 <p>Search syntax is limited to <a href="https://www.sqlite.org/fts5.html">SQLite's FTS5 syntax</a>. for now.</p>
 
+@@ exception.html.ep
+% layout 'default';
+<h2>Invalid search</h2>
+
 @@ openbsd-app-opensearch.xml.ep
 <?xml version="1.0" encoding="utf-8"?>
 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
