@@ -57,9 +57,10 @@ morbo openbsd.app.pl
 ## TODOs
 
 - [X] `use OpenBSD::Pledge` / `use OpenBSD::Unveil`.
-- [ ] Automate building of the fts DBs.
+- [X] Automate building of the fts DBs.
     - Fetch $release sqlports and $current sqlports and create.
 - [X] OpenSearch support.
-- [ ] Parse input to match `Full-text Query Syntax`: https://www.sqlite.org/fts5.html .
-- [ ] Style.
+- [X] ~~Parse input to match `Full-text Query Syntax`: https://www.sqlite.org/fts5.html .~~
+    - Only searching for letters for now.
+- [X] Style.
 - [X] Stable and unstable search.
