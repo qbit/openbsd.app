@@ -178,6 +178,10 @@ get '/' => sub ($c) {
     }
 };
 
+get '/pico.classless.css' => sub ($c) {
+    $c->reply->static('pico.classless.css');
+};
+
 get '/openbsd-app-opensearch.xml' => sub ($c) {
     $c->res->headers->content_type('application/opensearchdescription+xml');
     $c->render(
@@ -203,7 +207,7 @@ __DATA__
       type="application/opensearchdescription+xml"
       title="<%= $title %>"
       href="/openbsd-app-opensearch.xml" />
-    <link rel="stylesheet" href="https://deftly.net/pico.classless.css">
+    <link rel="stylesheet" href="/pico.classless.css">
     <style>
     header {
         padding: 0px !important;
@@ -214,6 +218,23 @@ __DATA__
     .nowrap {
         white-space: nowrap;
     }
+      body {
+        font-family: Avenir, 'Open Sans', sans-serif;
+        background-color: #ffffea;
+      }
+
+      #search {
+        background-color: #fff;
+      }
+
+      table {
+        background-color: #fff;
+        border: 1px solid #dedeff;
+      }
+
+      table th {
+        background-color: #dedeff;
+      }
     </style>
   </head>
   <body>
@@ -249,10 +270,10 @@ __DATA__
   Found <b><%= @$results %></b> results for '<b><%= $search %></b>' in <%= $elapsed %> seconds.<br />
   <a href="/?search=<%= $search %>&format=json">View as JSON</a>
 </p>
-  <table class="results">
+  <table class="results" role="grid">
     <thead>
       <tr>
-        <th>Package Name</th>
+        <th class="nowrap">Package Name</th>
         <th>Path</th>
 	<th>Comment</th>
 	<th>Description</th>
