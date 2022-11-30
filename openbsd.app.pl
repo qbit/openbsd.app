@@ -245,7 +245,8 @@ __DATA__
       %= form_for '/' => begin
         %= search_field 'search', id => 'search', placeholder => 'Search', value => undef
         %= check_box  'current', role => "switch"
-        %= label_for 'switch' => 'Search -current'
+        %= label_for 'switch' => "Search -current"
+        (<%= $mtime %></i>)
       % end
 </header>
 <main>
@@ -298,7 +299,7 @@ __DATA__
 
 @@ index.html.ep
 % layout 'default';
-<p>Welcome! Default search queries OpenBSD 7.2 package sets. You can search -current packages (from <i><%= $mtime %></i>) by toggling the '-current' checkbox.</p>
+<p>Welcome! Default search queries OpenBSD 7.2 package sets.</p>
 
 @@ exception.html.ep
 % layout 'default';
