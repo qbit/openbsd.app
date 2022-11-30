@@ -204,85 +204,22 @@ __DATA__
       type="application/opensearchdescription+xml"
       title="<%= $title %>"
       href="/openbsd-app-opensearch.xml" />
-    <style>
-      body {
-        font-family: Avenir, 'Open Sans', sans-serif;
-        background-color: #ffffea;
-      }
-
-      table {
-        border-collapse:separate;
-        border:solid black 1px;
-        border-radius:6px;
-        background-color: #fff;
-      }
-
-      td, th {
-        border-left:solid black 1px;
-        border-top:solid black 1px;
-      }
-
-      th {
-        white-space: nowrap;
-        padding: 6px;
-      }
-
-      .search {
-        padding: 10px;
-        margin: 10px;
-        border-radius:6px;
-        box-shadow: 2px 2px 2px black;
-      }
-
-      th, .search {
-        border-top: none;
-        background-color: #eaeaff;
-      }
-
-      td:first-child, th:first-child {
-        border-left: none;
-      }
-
-      td {
-        padding: 10px;
-        text-align: left;
-      }
-
-      .tree {
-      }
-
-      pre {
-        text-align: left;
-      }
-
-      .nowrap {
-        white-space: nowrap;
-      }
-
-      footer, .wrap, .results {
-        text-align: center;
-      }
-    </style>
+    <link rel="stylesheet" href="https://deftly.net/pico.classless.css">
   </head>
   <body>
-    <div class="wrap">
+  <header>
       <h3><a href="/">OpenBSD.app - search packages</a></h3>
-      <div class="search">
-        %= form_for '/' => begin
-	  %= text_field search => ""
-	  -current
-	  %= check_box 'current'
-	  %= submit_button 'Search...'
-        % end
-      </div>
-    </div>
-    <div class="results">
-      <%== content %>
-    </div>
-    <hr />
+      %= form_for '/' => begin
+      %= tag 'input', type => 'search', name => 'search', id => 'search', placeholder => 'Search'
+      %= check_box id => 'switch', role => "switch"
+      %= label_for 'switch' => 'Search -current'
+      % end
+</header>
+<main>
+  <%== content %>
+</main>
     <footer>
       <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022 - proudly hosted on <a href="https://openbsd.amsterdam/">obsd.ams</a>!</p>
-      <p><a href="https://github.com/qbit/pkg">Prefer CLI?</a></p>
     </footer>
   </body>
 </html>
