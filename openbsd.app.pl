@@ -5,14 +5,14 @@
 
 use warnings;
 use strict;
-use Time::HiRes qw( time );
+use Time::HiRes qw(time);
 use File::Basename;
 
 use feature 'switch';
 
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
-use Text::Markdown qw{ markdown };
+use Text::Markdown qw{markdown};
 
 my $dbFile = "combined.db";
 
@@ -25,7 +25,7 @@ if ( $^O eq "openbsd" ) {
     OpenBSD::Unveil::unveil( dirname($0),  "rwc" ) or die;
     OpenBSD::Unveil::unveil( "/usr/local", "r" )   or die;
 
-    OpenBSD::Pledge::pledge(qw( stdio dns inet rpath proc flock wpath cpath ))
+    OpenBSD::Pledge::pledge(qw(stdio dns inet rpath proc flock wpath cpath))
       or die;
 }
 
@@ -112,7 +112,6 @@ sub fix_fts ($s) {
     $s =~ s/\s+$//g;
     return $s;
 }
-
 
 get '/tree' => sub ($c) {
     my $v = $c->validation;
@@ -205,14 +204,25 @@ __DATA__
       title="<%= $title %>"
       href="/openbsd-app-opensearch.xml" />
     <link rel="stylesheet" href="https://deftly.net/pico.classless.css">
+    <style>
+    header {
+        padding: 0px !important;
+    }
+    main {
+        padding: 0px !important;
+    }
+    .nowrap {
+        white-space: nowrap;
+    }
+    </style>
   </head>
   <body>
   <header>
       <h3><a href="/">OpenBSD.app - search packages</a></h3>
       %= form_for '/' => begin
-      %= tag 'input', type => 'search', name => 'search', id => 'search', placeholder => 'Search'
-      %= check_box id => 'switch', role => "switch"
-      %= label_for 'switch' => 'Search -current'
+        %= search_field 'search', id => 'search', placeholder => 'Search', value => undef
+        %= check_box  'current', role => "switch"
+        %= label_for 'switch' => 'Search -current'
       % end
 </header>
 <main>
@@ -257,7 +267,7 @@ __DATA__
           title="Dependencies for <%= $result->{FULLPKGNAME} %>"
         ><%= $result->{FULLPKGPATH} %></a>
       </td>
-      <td class="nowrap"><%== $result->{COMMENT_MATCH} %></td>
+      <td class=""><%== $result->{COMMENT_MATCH} %></td>
       <td><%== $result->{DESCR_MATCH} %></td>
     </tr>
 % }
