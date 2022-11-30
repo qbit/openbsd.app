@@ -218,23 +218,25 @@ __DATA__
     .nowrap {
         white-space: nowrap;
     }
-      body {
-        font-family: Avenir, 'Open Sans', sans-serif;
-        background-color: #ffffea;
-      }
+    html {
+      background-color: #ffffea;
+    }
+    body {
+      font-family: Avenir, 'Open Sans', sans-serif;
+    }
 
-      #search {
-        background-color: #fff;
-      }
+    #search {
+      background-color: #fff;
+    }
 
-      table {
-        background-color: #fff;
-        border: 1px solid #dedeff;
-      }
+    table {
+      background-color: #fff;
+      border: 1px solid #dedeff;
+    }
 
-      table th {
-        background-color: #dedeff;
-      }
+    table th {
+      background-color: #dedeff;
+    }
     </style>
   </head>
   <body>
