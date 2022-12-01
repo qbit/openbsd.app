@@ -221,10 +221,6 @@ __DATA__
     html {
       background-color: #ffffea;
     }
-    body {
-      font-family: Avenir, 'Open Sans', sans-serif;
-    }
-
     #search {
       background-color: #fff;
     }
