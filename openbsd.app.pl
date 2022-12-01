@@ -196,7 +196,7 @@ app->start;
 __DATA__
 @@ layouts/default.html.ep
 <!doctype html>
-<html class="no-js" lang="">
+<html class="no-js" lang="en">
   <head>
     <title><%= $title %></title>
     <meta charset="utf-8">
@@ -237,15 +237,19 @@ __DATA__
     table th {
       background-color: #dedeff;
     }
+    .none {
+      display: none;
+    }
     </style>
   </head>
   <body>
   <header>
       <h3><a href="/">OpenBSD.app - search packages</a></h3>
       %= form_for '/' => begin
+        %= label_for search => 'Search', class => 'none'
         %= search_field 'search', id => 'search', placeholder => 'Search', value => undef
-        %= check_box  'current', role => "switch"
-        %= label_for 'switch' => "Search -current"
+        %= check_box 'current', id => 'current', role => "switch"
+        %= label_for current => "Search -current"
         (<%= $mtime %></i>)
       % end
 </header>
