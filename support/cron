@@ -1,0 +1,4 @@
+SHELL=/bin/sh
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/X11R6/bin:/usr/local/sbin:/usr/local/bin
+
+0	0	*	*	*	app	-n	/home/app/openbsd.app/upgrade.sh && /etc/rc.d/openbsd_app restart

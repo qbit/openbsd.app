@@ -1,0 +1,13 @@
+#!/bin/ksh
+
+# /home/app/go/bin/domain openbsd.app -acme :8080 -tlsproxy 127.0.0.1:4343=127.0.0.1:3000 
+
+daemon="/home/app/go/bin/domain"
+daemon_flags="openbsd.app -acme :8080 -tlsproxy 127.0.0.1:4343=:3000,[::1]:4343=[::1]:3000 -cache /home/app/.cache"
+daemon_execdir="/home/app/"
+daemon_user="app"
+
+. /etc/rc.d/rc.subr
+
+rc_bg=YES
+rc_cmd $1

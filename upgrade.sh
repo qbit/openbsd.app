@@ -50,10 +50,10 @@ SQL=$(cat <<EOF
 EOF
 )
 
-rm -f combined.db
+rm -f ~/openbsd.app/combined.db
 printf "$SQL\n" ${CURRENT_FILE} \
 	"current_ports_fts" \
-	"current_ports_fts" | sqlite3 combined.db
+	"current_ports_fts" | sqlite3 ~/openbsd.app/combined.db
 printf "$SQL\n" ${STABLE_FILE} \
 	"stable_ports_fts" \
-	"stable_ports_fts" | sqlite3 combined.db
+	"stable_ports_fts" | sqlite3 ~/openbsd.app/combined.db

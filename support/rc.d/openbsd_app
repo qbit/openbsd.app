@@ -1,0 +1,15 @@
+#!/bin/ksh
+
+daemon="/usr/local/bin/morbo"
+daemon_flags="-m production -l http://[::1]:3000 -l http://127.0.0.1:3000 openbsd.app.pl"
+#daemon="/home/app/openbsd.app/openbsd.app.pl"
+#daemon_flags="daemon"
+daemon_execdir="/home/app/openbsd.app"
+daemon_user="app"
+
+. /etc/rc.d/rc.subr
+
+pexp="perl: openbsd.app.pl"
+
+rc_bg=YES
+rc_cmd $1
