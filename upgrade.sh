@@ -17,10 +17,10 @@ STABLE_FILE=${2:-/tmp/openbsd_app/stable/share/sqlports}
 
 (
 	cd /tmp/openbsd_app/stable
-	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/7.2/packages/amd64/sqlports-7.36p0.tgz
-	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/7.2/packages/amd64/SHA256.sig
-	signify -C -p /etc/signify/openbsd-72-pkg.pub -x SHA256.sig sqlports-7.36p0.tgz
-	tar -C . -zxvf sqlports-7.36p0.tgz
+	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/7.3/packages/amd64/sqlports-7.37.tgz
+	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/7.3/packages/amd64/SHA256.sig
+	signify -C -p /etc/signify/openbsd-73-pkg.pub -x SHA256.sig sqlports-7.37.tgz
+	tar -C . -zxvf sqlports-7.37.tgz
 )
 
 SQL=$(cat <<EOF
