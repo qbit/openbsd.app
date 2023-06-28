@@ -9,10 +9,10 @@ STABLE_FILE=${2:-/tmp/openbsd_app/stable/share/sqlports}
 
 (
 	cd /tmp/openbsd_app/current
-	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/snapshots/packages/amd64/sqlports-7.37.tgz
+	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/snapshots/packages/amd64/sqlports-7.38.tgz
 	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/snapshots/packages/amd64/SHA256.sig
-	signify -C -p /etc/signify/openbsd-73-pkg.pub -x SHA256.sig sqlports-7.37.tgz
-	tar -C . -zxvf sqlports-7.37.tgz
+	signify -C -p /etc/signify/openbsd-73-pkg.pub -x SHA256.sig sqlports-7.38.tgz
+	tar -C . -zxvf sqlports-7.38.tgz
 )
 
 (
