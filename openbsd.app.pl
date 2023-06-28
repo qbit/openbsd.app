@@ -12,7 +12,6 @@ use feature 'switch';
 
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
-use Text::Markdown qw{markdown};
 
 my $dbFile = "combined.db";
 
@@ -88,6 +87,12 @@ SELECT substr('..........',1,level*3) || name FROM under_port;
 
 my $title = "OpenBSD.app";
 my $descr = "OpenBSD package search";
+
+sub markdown($str) {
+    $str =~ s/\*\*(.+)\*\*/<strong>$1<\/strong>/g;
+    $str =~ s/\n/<br \/>/g;
+    return $str;
+}
 
 sub to_md ($results) {
     foreach my $result (@$results) {
