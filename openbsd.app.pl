@@ -153,6 +153,7 @@ get '/' => sub ($c) {
     $c->stash( title => $title );
     $c->stash( descr => $descr );
     $c->stash( mtime => $mtime );
+    $c->stash( year => (localtime)[5] + 1900 );
 
     if ( defined $search && $search ne "" ) {
         my $db = $c->sqlite->db;
@@ -259,7 +260,7 @@ __DATA__
   <%== content %>
 </main>
     <footer>
-      <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022-2023 - proudly hosted on <a href="https://openbsd.amsterdam/">obsd.ams</a>!</p>
+      <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022-<%= $year %> - proudly hosted on <a href="https://openbsd.amsterdam/">obsd.ams</a>!</p>
     </footer>
   </body>
 </html>
