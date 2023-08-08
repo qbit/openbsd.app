@@ -62,6 +62,7 @@ my $query = q{
 	  FULLPKGPATH,
 	  COMMENT,
 	  DESCRIPTION,
+      HOMEPAGE,
 	  highlight(%s, 2, '**', '**') AS COMMENT_MATCH,
 	  highlight(%s, 3, '**', '**') AS DESCR_MATCH
     FROM %s
@@ -282,7 +283,7 @@ __DATA__
     <thead>
       <tr>
         <th class="nowrap">Package Name</th>
-        <th>Path</th>
+        <th>Details</th>
 	<th>Comment</th>
 	<th>Description</th>
       </tr>
@@ -291,10 +292,36 @@ __DATA__
     <tr>
       <td class="nowrap"><%= $result->{FULLPKGNAME} %></td>
       <td class="nowrap">
-        <a
-          href="/tree?name=<%= $result->{FULLPKGPATH} %>"
-          title="Dependencies for <%= $result->{FULLPKGNAME} %>"
-        ><%= $result->{FULLPKGPATH} %></a>
+        <ul>
+            <li>
+                <%= $result->{FULLPKGPATH} %>
+            </li>
+            <ul>
+                <li>
+                    <a
+                      href="<%= $result->{HOMEPAGE} %>"
+                      title="Home page for <%= $result->{FULLPKGNAME} %>"
+                    >Home page</a>
+                </li>
+                <li>
+                    <a href="/tree?name=<%= $result->{FULLPKGPATH} %>"
+                      title="Dependencies for <%= $result->{FULLPKGNAME} %>"
+                    >Dep Tree</a>
+                </li>
+                <li>
+                    <a
+                      href="https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/<%= $result->{FULLPKGPATH} %>"
+                      title="CVSWeb page for <%= $result->{FULLPKGNAME} %>"
+                    >CVS Web</a>
+                </li>
+                <li>
+                    <a
+                      href="https://github.com/openbsd/ports/tree/master/<%= $result->{FULLPKGPATH} %>"
+                      title="OpenBSD GitHub page for <%= $result->{FULLPKGNAME} %>"
+                    >GitHub</a>
+                </li>
+            </ul>
+        </ul>
       </td>
       <td class=""><%== $result->{COMMENT_MATCH} %></td>
       <td><%== $result->{DESCR_MATCH} %></td>
