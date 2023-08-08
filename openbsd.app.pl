@@ -259,7 +259,7 @@ __DATA__
   <%== content %>
 </main>
     <footer>
-      <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022 - proudly hosted on <a href="https://openbsd.amsterdam/">obsd.ams</a>!</p>
+      <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022-2023 - proudly hosted on <a href="https://openbsd.amsterdam/">obsd.ams</a>!</p>
     </footer>
   </body>
 </html>
