@@ -1,7 +1,7 @@
 {
   description = "openbsd.app: a tool to search OpenBSD packages";
 
-  inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "nixpkgs";
 
   outputs = { self, nixpkgs }:
     let
@@ -21,7 +21,7 @@
               perl
               Mojolicious
               MojoSQLite
-              pkgs.minisign
+              pkgs.outils
             ];
             buildInputs = with pkgs; [ perl ];
 
@@ -46,7 +46,7 @@
               perl
               Mojolicious
               MojoSQLite
-              pkgs.minisign
+              pkgs.outils
             ];
           };
         });
