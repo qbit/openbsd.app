@@ -253,7 +253,7 @@ __DATA__
         %= search_field 'search', id => 'search', placeholder => 'Search', value => undef
         %= check_box 'current', id => 'current', role => "switch"
         %= label_for current => "Search -current"
-        (<%= $mtime %></i>)
+        (<%= $mtime %>)
       % end
 </header>
 <main>
