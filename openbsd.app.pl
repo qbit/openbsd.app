@@ -151,7 +151,7 @@ get '/' => sub ($c) {
     $c->stash( title => $title );
     $c->stash( descr => $descr );
     $c->stash( mtime => $mtime );
-    $c->stash( year => (localtime)[5] + 1900 );
+    $c->stash( year  => (localtime)[5] + 1900 );
 
     if ( defined $search && $search ne "" ) {
         my $db = $c->sqlite->db;
