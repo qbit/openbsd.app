@@ -89,8 +89,8 @@ SELECT substr('..........',1,level*3) || name FROM under_port;
 my $title = "OpenBSD.app";
 my $descr = "OpenBSD package search";
 
-sub markdown($str) {
-    $str =~ s/\*\*(.+)\*\*/<strong>$1<\/strong>/g;
+sub markdown ($str) {
+    $str =~ s/\*\*(\w+)\*\*/<strong>$1<\/strong>/g;
     $str =~ s/\n/<br \/>/g;
     return $str;
 }
