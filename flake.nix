@@ -1,7 +1,7 @@
 {
   description = "openbsd.app: a tool to search OpenBSD packages";
 
-  inputs.nixpkgs.url = "nixpkgs";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs";
 
   outputs = { self, nixpkgs }:
     let
