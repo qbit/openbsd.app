@@ -8,8 +8,6 @@ use strict;
 use Time::HiRes qw(time);
 use File::Basename;
 
-use feature 'switch';
-
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
 
@@ -166,18 +164,16 @@ get '/' => sub ($c) {
 
         to_md($results);
 
-        given ($format) {
-            when ("json") {
-                $c->render( json => $results );
-            }
-            default {
-                $c->render(
-                    template => 'results',
-                    search   => $search,
-                    elapsed  => $elapsed,
-                    results  => $results
-                );
-            }
+        if ( $format eq "json" ) {
+            $c->render( json => $results );
+        }
+        else {
+            $c->render(
+                template => 'results',
+                search   => $search,
+                elapsed  => $elapsed,
+                results  => $results
+            );
         }
     }
     else {
