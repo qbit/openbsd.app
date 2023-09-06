@@ -10,6 +10,7 @@ use File::Basename;
 
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
+use HTML::Escape qw/escape_html/;
 
 my $dbFile = "combined.db";
 
@@ -88,6 +89,7 @@ my $title = "OpenBSD.app";
 my $descr = "OpenBSD package search";
 
 sub markdown ($str) {
+    $str = escape_html($str);
     $str =~ s/\*\*(\w+)\*\*/<strong>$1<\/strong>/g;
     $str =~ s/\n/<br \/>/g;
     return $str;

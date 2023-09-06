@@ -22,6 +22,7 @@
               Mojolicious
               MojoSQLite
               pkgs.outils
+              HTMLEscape
             ];
             buildInputs = with pkgs; [ perl ];
 
@@ -47,6 +48,7 @@
               Mojolicious
               MojoSQLite
               pkgs.outils
+              HTMLEscape
             ];
           };
         });
