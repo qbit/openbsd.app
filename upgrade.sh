@@ -9,7 +9,7 @@ STABLE_VER="7.37"
 CURRENT_FILE=${1:-/tmp/openbsd_app/current/share/sqlports}
 STABLE_FILE=${2:-/tmp/openbsd_app/stable/share/sqlports}
 SIGNIFY="${SIGNIFY:-signify}"
-CURRENT_PUB=$(readlink -f /etc/signify/openbsd-73-pkg.pub)
+CURRENT_PUB=$(readlink -f /etc/signify/openbsd-74-pkg.pub)
 STABLE_PUB=$(readlink -f /etc/signify/openbsd-73-pkg.pub)
 
 (
