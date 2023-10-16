@@ -5,12 +5,12 @@ set -xe
 mkdir -p /tmp/openbsd_app/{stable,current}
 
 CURRENT_VER="7.49"
-STABLE_VER="7.37"
+STABLE_VER="7.49"
 CURRENT_FILE=${1:-/tmp/openbsd_app/current/share/sqlports}
 STABLE_FILE=${2:-/tmp/openbsd_app/stable/share/sqlports}
 SIGNIFY="${SIGNIFY:-signify}"
 CURRENT_PUB=$(readlink -f /etc/signify/openbsd-74-pkg.pub)
-STABLE_PUB=$(readlink -f /etc/signify/openbsd-73-pkg.pub)
+STABLE_PUB=$(readlink -f /etc/signify/openbsd-74-pkg.pub)
 
 (
 	cd /tmp/openbsd_app/current
@@ -22,8 +22,8 @@ STABLE_PUB=$(readlink -f /etc/signify/openbsd-73-pkg.pub)
 
 (
 	cd /tmp/openbsd_app/stable
-	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/7.3/packages/amd64/sqlports-${STABLE_VER}.tgz
-	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/7.3/packages/amd64/SHA256.sig
+	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/7.4/packages/amd64/sqlports-${STABLE_VER}.tgz
+	curl -L -O https://cdn.openbsd.org/pub/OpenBSD/7.4/packages/amd64/SHA256.sig
 	${SIGNIFY} -C -p ${STABLE_PUB} -x SHA256.sig sqlports-${STABLE_VER}.tgz
 	tar -C . -zxvf sqlports-${STABLE_VER}.tgz
 )

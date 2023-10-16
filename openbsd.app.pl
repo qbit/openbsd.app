@@ -330,7 +330,7 @@ __DATA__
 
 @@ index.html.ep
 % layout 'default';
-<p>Welcome! Default search queries OpenBSD 7.3 package sets.</p>
+<p>Welcome! Default search queries OpenBSD 7.4 package sets.</p>
 
 @@ exception.html.ep
 % layout 'default';
