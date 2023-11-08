@@ -12,7 +12,12 @@ use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
 use HTML::Escape qw/escape_html/;
 
-my $dbFile = "combined.db";
+my $dbFile       = "combined.db";
+my $sqlPortsFile = "/usr/local/share/sqlports";
+
+my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
+  localtime();
+$year = $year + 1900;
 
 if ( $^O eq "openbsd" ) {
     require OpenBSD::Pledge;
@@ -25,6 +30,9 @@ if ( $^O eq "openbsd" ) {
 
     OpenBSD::Pledge::pledge(qw(stdio dns inet rpath proc flock wpath cpath))
       or die;
+}
+else {
+    $sqlPortsFile = "/tmp/openbsd_app/stable/share/sqlports";
 }
 
 my $mtime = ( stat($dbFile) )[9];
@@ -44,8 +52,7 @@ helper sqlite => sub {
 
 helper sqlports => sub {
     state $sql = Mojo::SQLite->new;
-    $sql->from_filename( "/usr/local/share/sqlports",
-        { ReadOnly => 1, no_wal => 1 } );
+    $sql->from_filename( $sqlPortsFile, { ReadOnly => 1, no_wal => 1 } );
     $sql->on(
         connection => sub {
             my ( $sql, $dbh ) = @_;
@@ -85,6 +92,25 @@ my $depsQuery = q{
 SELECT substr('..........',1,level*3) || name FROM under_port;
 };
 
+my $reverseQuery = q{
+  WITH RECURSIVE d (fullpkgpath, dependspath, type) as 
+    (select root.fullpkgpath, root.dependspath, root.type 
+        from _canonical_depends root 
+        join _paths  
+            on root.dependspath=_paths.canonical 
+        join _paths p2  
+            on p2.fullpkgpath = ? and p2.id=_paths.pkgpath
+        where root.type!=3             
+    union                                      
+        select child.fullpkgpath, child.dependspath, child.type 
+            from d parent, _canonical_depends child   
+        where parent.fullpkgpath=child.dependspath and child.type!=3)
+            select distinct _paths.fullpkgpath from d                                           
+        join _paths  
+            on _paths.id=d.fullpkgpath 
+        order by _paths.fullpkgpath;
+};
+
 my $title = "OpenBSD.app";
 my $descr = "OpenBSD package search";
 
@@ -119,18 +145,43 @@ sub fix_fts ($s) {
     return $s;
 }
 
+get '/reverse' => sub ($c) {
+    my $v = $c->validation;
+
+    $c->stash( title => $title );
+    $c->stash( descr => $descr );
+    $c->stash( mtime => $mtime );
+    $c->stash( year  => (localtime)[5] + 1900 );
+
+    my $search = $c->param('name');
+    my $raw    = $c->param('raw');
+    my $db     = $c->sqlports->db;
+
+    if ( defined $raw && $raw ne "" ) {
+        $c->render( text => $db->query( $reverseQuery, $search )->text );
+    }
+    else {
+        $c->render(
+            template => 'reverse',
+            name     => $search,
+            list     => $db->query( $reverseQuery, $search )->text
+        );
+    }
+};
+
 get '/tree' => sub ($c) {
     my $v = $c->validation;
 
     $c->stash( title => $title );
     $c->stash( descr => $descr );
     $c->stash( mtime => $mtime );
+    $c->stash( year  => (localtime)[5] + 1900 );
 
     my $search = $c->param('name');
     my $raw    = $c->param('raw');
     my $db     = $c->sqlports->db;
 
-    if ( $raw ne "" ) {
+    if ( defined $raw && $raw ne "" ) {
         $c->render( text => $db->query( $depsQuery, $search )->text );
     }
     else {
@@ -272,6 +323,15 @@ __DATA__
   </p>
 </div>
 
+@@ reverse.html.ep
+% layout 'default';
+<div>
+  <h3>Reverse dependency list for: <%= $name %></h3>
+  <p>
+    <pre><%= $list %></pre>
+  </p>
+</div>
+
 @@ results.html.ep
 % layout 'default';
 <p>
@@ -306,6 +366,11 @@ __DATA__
                     <a href="/tree?name=<%= $result->{FULLPKGPATH} %>"
                       title="Dependencies for <%= $result->{FULLPKGNAME} %>"
                     >Dep Tree</a>
+                </li>
+                <li>
+                    <a href="/reverse?name=<%= $result->{FULLPKGPATH} %>"
+                      title="Reverse dependencies for <%= $result->{FULLPKGNAME} %>"
+                    >Reverse Dep List</a>
                 </li>
                 <li>
                     <a
