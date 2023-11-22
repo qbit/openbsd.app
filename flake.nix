@@ -40,6 +40,7 @@
           default = pkgs.mkShell {
             shellHook = ''
               PS1='\u@\h:\@; '
+              nix run github:qbit/xin#flake-warn
               echo "Perl `${pkgs.perl}/bin/perl --version`"
             '';
             buildInputs = with pkgs.perlPackages; [ PerlTidy pkgs.sqlite ];
