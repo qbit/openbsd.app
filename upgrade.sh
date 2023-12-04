@@ -4,7 +4,7 @@ set -xe
 
 mkdir -p /tmp/openbsd_app/{stable,current}
 
-CURRENT_VER="7.51"
+CURRENT_VER="7.52"
 STABLE_VER="7.49"
 CURRENT_FILE=${1:-/tmp/openbsd_app/current/share/sqlports}
 STABLE_FILE=${2:-/tmp/openbsd_app/stable/share/sqlports}
