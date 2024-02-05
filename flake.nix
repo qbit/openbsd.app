@@ -50,7 +50,7 @@
               MojoSQLite
               pkgs.outils
               HTMLEscape
-            ];
+            ] ++ [ pkgs.rlwrap ];
           };
         });
     };
