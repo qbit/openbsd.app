@@ -309,7 +309,12 @@ __DATA__
   <%== content %>
 </main>
     <footer>
-      <p><a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022-<%= $year %> - proudly hosted on <a href="https://openbsd.amsterdam/">obsd.ams</a>!</p>
+      <p>
+        <a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022-<%= $year %> - proudly hosted on <a href="https://openbsd.amsterdam/">obsd.ams</a>!
+      </p>
+      <p>
+        <a href="https://www.buymeacoffee.com/qbit">Buy me a coffee!</a>
+      </p>
     </footer>
   </body>
 </html>
