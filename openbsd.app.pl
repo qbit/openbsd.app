@@ -364,10 +364,14 @@ __DATA__
             </li>
             <ul>
                 <li>
+                    % if ($result->{HOMEPAGE} ne "") {
                     <a
                       href="<%= $result->{HOMEPAGE} %>"
                       title="Home page for <%= $result->{FULLPKGNAME} %>"
                     >Home page</a>
+                    % } else {
+                    <s>Home page</s>
+                    % }
                 </li>
                 <li>
                     <a href="/tree?name=<%= $result->{FULLPKGPATH} %>"
