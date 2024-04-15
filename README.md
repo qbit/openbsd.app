@@ -40,9 +40,7 @@ Currently OpenBSD is missing the p5-Mojo-SQLite package, so one will either have
 for it to be added to -current
 
 ```
-$ doas pkg_add p5-Mojolicious p5-Text-Markdown sqlports
-$ portgen p5 Mojo::SQLite
-$ cd /usr/ports/mystuff/cpan/p5-Mojo-SQLite && make install
+$ doas pkg_add p5-Mojolicious p5-Text-Markdown p5-Mojo-SQLite sqlports
 $ morbo openbsd.app.pl
 ```
 
