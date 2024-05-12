@@ -111,6 +111,17 @@ my $reverseQuery = q{
         order by _paths.fullpkgpath;
 };
 
+my $pathQuery = q{
+    SELECT
+	  FULLPKGNAME,
+	  FULLPKGPATH,
+	  COMMENT,
+	  DESCRIPTION,
+      HOMEPAGE
+    FROM %s
+    WHERE FULLPKGPATH = ?;
+};
+
 my $title = "OpenBSD.app";
 my $descr = "OpenBSD package search";
 
@@ -193,18 +204,42 @@ get '/tree' => sub ($c) {
     }
 };
 
+get '/path/*' => sub ($c) {
+    my $p = $c->req->url->path;
+    $p =~ s/^\/path\///;
+
+    my $current = $c->param('current');
+
+    $c->stash( title => $title );
+    $c->stash( descr => $descr );
+    $c->stash( mtime => $mtime );
+    $c->stash( year  => (localtime)[5] + 1900 );
+
+    my $db = $c->sqlite->db;
+    my $q  = sprintf( $pathQuery,
+        defined($current) ? "current_ports_fts" : "stable_ports_fts" );
+
+    $c->render(
+        template => 'path',
+        name     => $p,
+        info     => $db->query( $q, $p )->hash
+    );
+};
+
 get '/' => sub ($c) {
     my $v = $c->validation;
 
     my $search = fix_fts $c->param('search');
 
     my $current = $c->param('current');
+    my $link    = defined($current) ? "?current=on" : "";
     my $format  = $c->param('format');
 
-    $c->stash( title => $title );
-    $c->stash( descr => $descr );
-    $c->stash( mtime => $mtime );
-    $c->stash( year  => (localtime)[5] + 1900 );
+    $c->stash( current => $current );
+    $c->stash( title   => $title );
+    $c->stash( descr   => $descr );
+    $c->stash( mtime   => $mtime );
+    $c->stash( year    => (localtime)[5] + 1900 );
 
     if ( defined $search && $search ne "" ) {
         my $db = $c->sqlite->db;
@@ -225,6 +260,7 @@ get '/' => sub ($c) {
                 template => 'results',
                 search   => $search,
                 elapsed  => $elapsed,
+                link     => $link,
                 results  => $results
             );
         }
@@ -330,6 +366,75 @@ __DATA__
   </p>
 </div>
 
+@@ path.html.ep
+% layout 'default';
+<div>
+  <h3>Info for: <%= $name %></h3>
+  <p>
+  % if ($info->{FULLPKGNAME} ne "") {
+  <table class="results" role="grid">
+    <thead>
+      <tr>
+        <th class="nowrap">Package Name</th>
+        <th>Details</th>
+	<th>Comment</th>
+	<th>Description</th>
+      </tr>
+    </thead>
+    <tr>
+      <td class="nowrap"><%= $info->{FULLPKGNAME} %></td>
+      <td class="nowrap">
+        <ul>
+            <li>
+                <%= $info->{FULLPKGPATH} %>
+            </li>
+            <ul>
+                <li>
+                    % if ($info->{HOMEPAGE} ne "") {
+                    <a
+                      href="<%= $info->{HOMEPAGE} %>"
+                      title="Home page for <%= $info->{FULLPKGNAME} %>"
+                    >Home page</a>
+                    % } else {
+                    <s>Home page</s>
+                    % }
+                </li>
+                <li>
+                    <a href="/tree?name=<%= $info->{FULLPKGPATH} %>"
+                      title="Dependencies for <%= $info->{FULLPKGNAME} %>"
+                    >Dep Tree</a>
+                </li>
+                <li>
+                    <a href="/reverse?name=<%= $info->{FULLPKGPATH} %>"
+                      title="Reverse dependencies for <%= $info->{FULLPKGNAME} %>"
+                    >Reverse Dep List</a>
+                </li>
+                <li>
+                    <a
+                      href="https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/<%= $info->{FULLPKGPATH} %>"
+                      title="CVSWeb page for <%= $info->{FULLPKGNAME} %>"
+                    >CVS Web</a>
+                </li>
+                <li>
+                    <a
+                      href="https://github.com/openbsd/ports/tree/master/<%= $info->{FULLPKGPATH} %>"
+                      title="OpenBSD GitHub page for <%= $info->{FULLPKGNAME} %>"
+                    >GitHub</a>
+                </li>
+            </ul>
+        </ul>
+      </td>
+      <td class=""><%== $info->{COMMENT} %></td>
+      <td><%== $info->{DESCRIPTION} %></td>
+    </tr>
+  </table>
+  % } else {
+  Nothing found.
+  % }
+  </p>
+</div>
+
+
 @@ reverse.html.ep
 % layout 'default';
 <div>
@@ -361,6 +466,7 @@ __DATA__
         <ul>
             <li>
                 <%= $result->{FULLPKGPATH} %>
+                <a href="/path/<%= $result->{FULLPKGPATH} . $link %>" title="Direct link to package info">🔗</a>
             </li>
             <ul>
                 <li>
