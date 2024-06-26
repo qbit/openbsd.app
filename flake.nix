@@ -43,7 +43,7 @@
               nix run github:qbit/xin#flake-warn
               echo "Perl `${pkgs.perl}/bin/perl --version`"
             '';
-            buildInputs = with pkgs.perlPackages; [ PerlTidy pkgs.sqlite ];
+            buildInputs = with pkgs.perlPackages; [ PerlTidy pkgs.sqlite PerlLanguageServer ];
             nativeBuildInputs = with pkgs.perlPackages; [
               perl
               Mojolicious

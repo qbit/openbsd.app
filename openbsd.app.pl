@@ -404,6 +404,8 @@ __DATA__
                       title="Dependencies for <%= $info->{FULLPKGNAME} %>"
                     >Dep Tree</a>
                 </li>
+		% my $clean_name = $info->{FULLPKGPATH};
+		% $clean_name =~ s/^(.*),.*$/$1/;
                 <li>
                     <a href="/reverse?name=<%= $info->{FULLPKGPATH} %>"
                       title="Reverse dependencies for <%= $info->{FULLPKGNAME} %>"
@@ -411,13 +413,13 @@ __DATA__
                 </li>
                 <li>
                     <a
-                      href="https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/<%= $info->{FULLPKGPATH} %>"
+                      href="https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/<%= $clean_name %>"
                       title="CVSWeb page for <%= $info->{FULLPKGNAME} %>"
                     >CVS Web</a>
                 </li>
                 <li>
                     <a
-                      href="https://github.com/openbsd/ports/tree/master/<%= $info->{FULLPKGPATH} %>"
+                      href="https://github.com/openbsd/ports/tree/master/<%= $clean_name %>"
                       title="OpenBSD GitHub page for <%= $info->{FULLPKGNAME} %>"
                     >GitHub</a>
                 </li>
@@ -484,6 +486,8 @@ __DATA__
                       title="Dependencies for <%= $result->{FULLPKGNAME} %>"
                     >Dep Tree</a>
                 </li>
+		% my $clean_name = $result->{FULLPKGPATH};
+		% $clean_name =~ s/^(.*),.*$/$1/;
                 <li>
                     <a href="/reverse?name=<%= $result->{FULLPKGPATH} %>"
                       title="Reverse dependencies for <%= $result->{FULLPKGNAME} %>"
@@ -491,13 +495,13 @@ __DATA__
                 </li>
                 <li>
                     <a
-                      href="https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/<%= $result->{FULLPKGPATH} %>"
+                      href="https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/<%= $clean_name %>"
                       title="CVSWeb page for <%= $result->{FULLPKGNAME} %>"
                     >CVS Web</a>
                 </li>
                 <li>
                     <a
-                      href="https://github.com/openbsd/ports/tree/master/<%= $result->{FULLPKGPATH} %>"
+                      href="https://github.com/openbsd/ports/tree/master/<%= $clean_name %>"
                       title="OpenBSD GitHub page for <%= $result->{FULLPKGNAME} %>"
                     >GitHub</a>
                 </li>
