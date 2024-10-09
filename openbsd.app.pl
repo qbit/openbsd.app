@@ -75,7 +75,7 @@ my $query = q{
     WHERE %s MATCH ? ORDER BY rank;
 };
 
-my $depsQuery = q{
+my $depTreeQuery = q{
   WITH RECURSIVE
   under_port(name,level) AS (
     VALUES(? ,0)
@@ -90,6 +90,23 @@ my $depsQuery = q{
      ORDER BY 2 DESC
   )
 SELECT substr('..........',1,level*3) || name FROM under_port;
+};
+
+my $depQuery = q{
+  WITH RECURSIVE
+  under_port(name,level) AS (
+    VALUES(? ,0)
+    UNION ALL
+    SELECT _depends.fulldepends, under_port.level+1
+      FROM
+        _depends
+      JOIN _paths ON _paths.id=_depends.fullpkgpath
+      join under_port ON _paths.fullpkgpath = under_port.name
+      where
+        _depends.type IN (0, 1)
+     ORDER BY 2 DESC
+  )
+SELECT distinct(name) FROM under_port;
 };
 
 my $reverseQuery = q{
@@ -180,6 +197,30 @@ get '/reverse' => sub ($c) {
     }
 };
 
+get '/flat-deps' => sub ($c) {
+    my $v = $c->validation;
+
+    $c->stash( title => $title );
+    $c->stash( descr => $descr );
+    $c->stash( mtime => $mtime );
+    $c->stash( year  => (localtime)[5] + 1900 );
+
+    my $search = $c->param('name');
+    my $raw    = $c->param('raw');
+    my $db     = $c->sqlports->db;
+
+    if ( defined $raw && $raw ne "" ) {
+        $c->render( text => $db->query( $depQuery, $search )->text );
+    }
+    else {
+        $c->render(
+            template => 'flat-deps',
+            name     => $search,
+            tree     => $db->query( $depQuery, $search )->text
+        );
+    }
+};
+
 get '/tree' => sub ($c) {
     my $v = $c->validation;
 
@@ -193,13 +234,13 @@ get '/tree' => sub ($c) {
     my $db     = $c->sqlports->db;
 
     if ( defined $raw && $raw ne "" ) {
-        $c->render( text => $db->query( $depsQuery, $search )->text );
+        $c->render( text => $db->query( $depTreeQuery, $search )->text );
     }
     else {
         $c->render(
             template => 'tree',
             name     => $search,
-            tree     => $db->query( $depsQuery, $search )->text
+            tree     => $db->query( $depTreeQuery, $search )->text
         );
     }
 };
@@ -366,6 +407,15 @@ __DATA__
   </p>
 </div>
 
+@@ flat-deps.html.ep
+% layout 'default';
+<div>
+  <h3>Flat dependency list for: <%= $name %></h3>
+  <p>
+    <pre><%= $tree %></pre>
+  </p>
+</div>
+
 @@ path.html.ep
 % layout 'default';
 <div>
@@ -403,6 +453,9 @@ __DATA__
                     <a href="/tree?name=<%= $info->{FULLPKGPATH} %>"
                       title="Dependencies for <%= $info->{FULLPKGNAME} %>"
                     >Dep Tree</a>
+		    (<a href="/flat-deps?name=<%= $info->{FULLPKGPATH} %>"
+		      title="Flat dependency list for <%= $info->{FULLPKGNAME} %>"
+		    >list</a>)
                 </li>
 		% my $clean_name = $info->{FULLPKGPATH};
 		% $clean_name =~ s/^(.*),.*$/$1/;
@@ -485,6 +538,9 @@ __DATA__
                     <a href="/tree?name=<%= $result->{FULLPKGPATH} %>"
                       title="Dependencies for <%= $result->{FULLPKGNAME} %>"
                     >Dep Tree</a>
+		    (<a href="/flat-deps?name=<%= $result->{FULLPKGPATH} %>"
+		      title="Flat dependency list for <%= $result->{FULLPKGNAME} %>"
+		    >list</a>)
                 </li>
 		% my $clean_name = $result->{FULLPKGPATH};
 		% $clean_name =~ s/^(.*),.*$/$1/;
