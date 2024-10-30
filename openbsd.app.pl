@@ -274,7 +274,7 @@ get '/' => sub ($c) {
 
     my $current = $c->param('current');
     my $link    = defined($current) ? "?current=on" : "";
-    my $format  = $c->param('format');
+    my $format  = $c->param('format') || "";
 
     $c->stash( current => $current );
     $c->stash( title   => $title );
@@ -440,7 +440,7 @@ __DATA__
             </li>
             <ul>
                 <li>
-                    % if ($info->{HOMEPAGE} ne "") {
+                    % if (defined($info->{HOMEPAGE})) {
                     <a
                       href="<%= $info->{HOMEPAGE} %>"
                       title="Home page for <%= $info->{FULLPKGNAME} %>"
@@ -525,7 +525,7 @@ __DATA__
             </li>
             <ul>
                 <li>
-                    % if ($result->{HOMEPAGE} ne "") {
+                    % if (defined($result->{HOMEPAGE})) {
                     <a
                       href="<%= $result->{HOMEPAGE} %>"
                       title="Home page for <%= $result->{FULLPKGNAME} %>"
