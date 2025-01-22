@@ -36,9 +36,6 @@ $ sqlite3 stable.db
 
 ### Running on OpenBSD
 
-Currently OpenBSD is missing the p5-Mojo-SQLite package, so one will either have to make it themselves (`portgen`) or wait
-for it to be added to -current
-
 ```
 $ doas pkg_add p5-Mojolicious p5-Text-Markdown p5-Mojo-SQLite sqlports
 $ morbo openbsd.app.pl
