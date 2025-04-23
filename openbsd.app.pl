@@ -387,7 +387,7 @@ __DATA__
 </main>
     <footer>
       <p>
-        <a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022-<%= $year %> - proudly hosted on <a href="https://openbsd.amsterdam/">obsd.ams</a>!
+        <a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022-<%= $year %> - proudly hosted on <a href="https://openbsd.amsterdam/">obsda.ms</a>!
       </p>
       <p>
         Made with <3 by <a rel="nofollow me" href="https://mammothcirc.us/@qbit">qbit</a>
