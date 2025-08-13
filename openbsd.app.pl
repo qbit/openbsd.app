@@ -387,7 +387,10 @@ __DATA__
 </main>
     <footer>
       <p>
-        <a href="https://github.com/qbit/openbsd.app">OpenBSD.app</a> © 2022-<%= $year %> - proudly hosted on <a href="https://openbsd.amsterdam/">obsda.ms</a>!
+        <a href="https://codeberg.org/qbit/openbsd.app">OpenBSD.app</a> © 2022-<%= $year %> - proudly hosted on <a href="https://openbsd.amsterdam/">obsda.ms</a>!
+      </p>
+      <p>
+        Prefer the CLI? Check out <a href="https://codeberg.org/qbit/pkg">pkg</a>, which offers the same capabilities as this site.
       </p>
       <p>
         Made with <3 by <a rel="nofollow me" href="https://mammothcirc.us/@qbit">qbit</a>
@@ -472,9 +475,9 @@ __DATA__
                 </li>
                 <li>
                     <a
-                      href="https://github.com/openbsd/ports/tree/master/<%= $clean_name %>"
-                      title="OpenBSD GitHub page for <%= $info->{FULLPKGNAME} %>"
-                    >GitHub</a>
+                      href="https://codeberg.org/openbsd/ports/src/branch/master/<%= $clean_name %>"
+                      title="OpenBSD Codeberg page for <%= $info->{FULLPKGNAME} %>"
+                    >Codeberg</a>
                 </li>
             </ul>
         </ul>
@@ -557,9 +560,9 @@ __DATA__
                 </li>
                 <li>
                     <a
-                      href="https://github.com/openbsd/ports/tree/master/<%= $clean_name %>"
-                      title="OpenBSD GitHub page for <%= $result->{FULLPKGNAME} %>"
-                    >GitHub</a>
+                      href="https://codeberg.org/openbsd/ports/src/branch/master/<%= $clean_name %>"
+                      title="OpenBSD Codeberg page for <%= $result->{FULLPKGNAME} %>"
+                    >Codeberg</a>
                 </li>
             </ul>
         </ul>
