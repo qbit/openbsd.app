@@ -10,10 +10,10 @@ use File::Basename;
 
 use Mojolicious::Lite -signatures;
 use Mojo::SQLite;
-use HTML::Escape qw/escape_html/;
 
-my $dbFile       = "combined.db";
-my $sqlPortsFile = "/usr/local/share/sqlports";
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+use Queries;
 
 my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
   localtime();
@@ -32,15 +32,15 @@ if ( $^O eq "openbsd" ) {
       or die;
 }
 else {
-    $sqlPortsFile = "/tmp/openbsd_app/stable/share/sqlports";
+    $Queries::sqlPortsFile = "/tmp/openbsd_app/stable/share/sqlports";
 }
 
-my $mtime = ( stat($dbFile) )[9];
+my $mtime = ( stat($Queries::dbFile) )[9];
 $mtime = scalar localtime $mtime;
 
 helper sqlite => sub {
     state $sql = Mojo::SQLite->new;
-    $sql->from_filename( $dbFile, { ReadOnly => 1, no_wal => 1 } );
+    $sql->from_filename( $Queries::dbFile, { ReadOnly => 1, no_wal => 1 } );
     $sql->on(
         connection => sub {
             my ( $sql, $dbh ) = @_;
@@ -52,7 +52,7 @@ helper sqlite => sub {
 
 helper sqlports => sub {
     state $sql = Mojo::SQLite->new;
-    $sql->from_filename( $sqlPortsFile, { ReadOnly => 1, no_wal => 1 } );
+    $sql->from_filename( $Queries::sqlPortsFile, { ReadOnly => 1, no_wal => 1 } );
     $sql->on(
         connection => sub {
             my ( $sql, $dbh ) = @_;
@@ -62,122 +62,11 @@ helper sqlports => sub {
     return $sql;
 };
 
-my $query = q{
-    SELECT
-	  FULLPKGNAME,
-	  FULLPKGPATH,
-	  COMMENT,
-	  DESCRIPTION,
-      HOMEPAGE,
-	  highlight(%s, 2, '**', '**') AS COMMENT_MATCH,
-	  highlight(%s, 3, '**', '**') AS DESCR_MATCH
-    FROM %s
-    WHERE %s MATCH ? ORDER BY rank;
-};
-
-my $depTreeQuery = q{
-  WITH RECURSIVE
-  under_port(name,level) AS (
-    VALUES(? ,0)
-    UNION ALL
-    SELECT _depends.fulldepends, under_port.level+1
-      FROM
-        _depends
-      JOIN _paths ON _paths.id=_depends.fullpkgpath
-      join under_port ON _paths.fullpkgpath = under_port.name
-      where
-        _depends.type IN (0, 1)
-     ORDER BY 2 DESC
-  )
-SELECT substr('..........',1,level*3) || name FROM under_port;
-};
-
-my $depQuery = q{
-  WITH RECURSIVE
-  under_port(name,level) AS (
-    VALUES(? ,0)
-    UNION ALL
-    SELECT _depends.fulldepends, under_port.level+1
-      FROM
-        _depends
-      JOIN _paths ON _paths.id=_depends.fullpkgpath
-      join under_port ON _paths.fullpkgpath = under_port.name
-      where
-        _depends.type IN (0, 1)
-     ORDER BY 2 DESC
-  )
-SELECT distinct(name) FROM under_port;
-};
-
-my $reverseQuery = q{
-  WITH RECURSIVE d (fullpkgpath, dependspath, type) as 
-    (select root.fullpkgpath, root.dependspath, root.type 
-        from _canonical_depends root 
-        join _paths  
-            on root.dependspath=_paths.canonical 
-        join _paths p2  
-            on p2.fullpkgpath = ? and p2.id=_paths.pkgpath
-        where root.type!=3             
-    union                                      
-        select child.fullpkgpath, child.dependspath, child.type 
-            from d parent, _canonical_depends child   
-        where parent.fullpkgpath=child.dependspath and child.type!=3)
-            select distinct _paths.fullpkgpath from d                                           
-        join _paths  
-            on _paths.id=d.fullpkgpath 
-        order by _paths.fullpkgpath;
-};
-
-my $pathQuery = q{
-    SELECT
-	  FULLPKGNAME,
-	  FULLPKGPATH,
-	  COMMENT,
-	  DESCRIPTION,
-      HOMEPAGE
-    FROM %s
-    WHERE FULLPKGPATH = ?;
-};
-
-my $title = "OpenBSD.app";
-my $descr = "OpenBSD package search";
-
-sub markdown ($str) {
-    $str = escape_html($str);
-    $str =~ s/\*\*(\w+)\*\*/<strong>$1<\/strong>/g;
-    $str =~ s/\n/<br \/>/g;
-    return $str;
-}
-
-sub to_md ($results) {
-    foreach my $result (@$results) {
-        $result->{DESCR_MATCH}   = markdown( $result->{DESCR_MATCH} );
-        $result->{COMMENT_MATCH} = markdown( $result->{COMMENT_MATCH} );
-    }
-
-}
-
-sub set_query ($is_current) {
-    if ($is_current) {
-        return sprintf( $query, ("current_ports_fts") x 4 );
-    }
-
-    return sprintf( $query, ("stable_ports_fts") x 4 );
-}
-
-sub fix_fts ($s) {
-    return "" unless defined $s;
-    $s =~ s/[^\w]/ /g;
-    $s =~ s/^\s+//g;
-    $s =~ s/\s+$//g;
-    return $s;
-}
-
 get '/reverse' => sub ($c) {
     my $v = $c->validation;
 
-    $c->stash( title => $title );
-    $c->stash( descr => $descr );
+    $c->stash( title => $Queries::title );
+    $c->stash( descr => $Queries::descr );
     $c->stash( mtime => $mtime );
     $c->stash( year  => (localtime)[5] + 1900 );
 
@@ -186,13 +75,13 @@ get '/reverse' => sub ($c) {
     my $db     = $c->sqlports->db;
 
     if ( defined $raw && $raw ne "" ) {
-        $c->render( text => $db->query( $reverseQuery, $search )->text );
+        $c->render( text => $db->query( $Queries::reverseQuery, $search )->text );
     }
     else {
         $c->render(
             template => 'reverse',
             name     => $search,
-            list     => $db->query( $reverseQuery, $search )->text
+            list     => $db->query( $Queries::reverseQuery, $search )->text
         );
     }
 };
@@ -200,8 +89,8 @@ get '/reverse' => sub ($c) {
 get '/flat-deps' => sub ($c) {
     my $v = $c->validation;
 
-    $c->stash( title => $title );
-    $c->stash( descr => $descr );
+    $c->stash( title => $Queries::title );
+    $c->stash( descr => $Queries::descr );
     $c->stash( mtime => $mtime );
     $c->stash( year  => (localtime)[5] + 1900 );
 
@@ -210,13 +99,13 @@ get '/flat-deps' => sub ($c) {
     my $db     = $c->sqlports->db;
 
     if ( defined $raw && $raw ne "" ) {
-        $c->render( text => $db->query( $depQuery, $search )->text );
+        $c->render( text => $db->query( $Queries::depQuery, $search )->text );
     }
     else {
         $c->render(
             template => 'flat-deps',
             name     => $search,
-            tree     => $db->query( $depQuery, $search )->text
+            tree     => $db->query( $Queries::depQuery, $search )->text
         );
     }
 };
@@ -224,8 +113,8 @@ get '/flat-deps' => sub ($c) {
 get '/tree' => sub ($c) {
     my $v = $c->validation;
 
-    $c->stash( title => $title );
-    $c->stash( descr => $descr );
+    $c->stash( title => $Queries::title );
+    $c->stash( descr => $Queries::descr );
     $c->stash( mtime => $mtime );
     $c->stash( year  => (localtime)[5] + 1900 );
 
@@ -234,13 +123,13 @@ get '/tree' => sub ($c) {
     my $db     = $c->sqlports->db;
 
     if ( defined $raw && $raw ne "" ) {
-        $c->render( text => $db->query( $depTreeQuery, $search )->text );
+        $c->render( text => $db->query( $Queries::depTreeQuery, $search )->text );
     }
     else {
         $c->render(
             template => 'tree',
             name     => $search,
-            tree     => $db->query( $depTreeQuery, $search )->text
+            tree     => $db->query( $Queries::depTreeQuery, $search )->text
         );
     }
 };
@@ -251,13 +140,13 @@ get '/path/*' => sub ($c) {
 
     my $current = $c->param('current');
 
-    $c->stash( title => $title );
-    $c->stash( descr => $descr );
+    $c->stash( title => $Queries::title );
+    $c->stash( descr => $Queries::descr );
     $c->stash( mtime => $mtime );
     $c->stash( year  => (localtime)[5] + 1900 );
 
     my $db = $c->sqlite->db;
-    my $q  = sprintf( $pathQuery,
+    my $q  = sprintf( $Queries::pathQuery,
         defined($current) ? "current_ports_fts" : "stable_ports_fts" );
 
     $c->render(
@@ -270,28 +159,28 @@ get '/path/*' => sub ($c) {
 get '/' => sub ($c) {
     my $v = $c->validation;
 
-    my $search = fix_fts $c->param('search');
+    my $search = Queries::fix_fts $c->param('search');
 
     my $current = $c->param('current');
     my $link    = defined($current) ? "?current=on" : "";
     my $format  = $c->param('format') || "";
 
     $c->stash( current => $current );
-    $c->stash( title   => $title );
-    $c->stash( descr   => $descr );
+    $c->stash( title   => $Queries::title );
+    $c->stash( descr   => $Queries::descr );
     $c->stash( mtime   => $mtime );
     $c->stash( year    => (localtime)[5] + 1900 );
 
     if ( defined $search && $search ne "" ) {
         my $db = $c->sqlite->db;
 
-        my $q       = set_query( defined $current );
+        my $q       = Queries::set_query( defined $current );
         my $start   = time();
         my $results = $db->query( $q, $search )->hashes;
         my $end     = time();
         my $elapsed = sprintf( "%2f\n", $end - $start );
 
-        to_md($results);
+        Queries::to_md($results);
 
         if ( $format eq "json" ) {
             $c->render( json => $results );
@@ -320,8 +209,8 @@ get '/openbsd-app-opensearch.xml' => sub ($c) {
     $c->render(
         template => 'openbsd-app-opensearch',
         format   => 'xml',
-        title    => $title,
-        descr    => $descr
+        title    => $Queries::title,
+        descr    => $Queries::descr
     );
 };
 
