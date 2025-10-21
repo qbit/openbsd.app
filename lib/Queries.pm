@@ -85,6 +85,14 @@ our $pathQuery = q{
 our $title = "OpenBSD.app";
 our $descr = "OpenBSD package search";
 
+sub na {
+    my $stuff = shift;
+    if (defined $stuff) {
+	return $stuff;
+    }
+    return "-";
+}
+
 sub set_query {
     my $is_current = shift;
     if ($is_current) {

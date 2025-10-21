@@ -53,7 +53,7 @@ Search: `B444`<search`>`b
 `=
 Package Name: <%= $result->{FULLPKGNAME} %>
 Comment:      <%= $result->{COMMENT_MATCH} %>
-Homepage:     <%= $result->{HOMEPAGE} %>
+Homepage:     <%= Queries::na($result->{HOMEPAGE}) %>
 Description:  <%= $result->{DESCR_MATCH} %>
 `=
 --
