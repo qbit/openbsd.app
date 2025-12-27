@@ -77,7 +77,7 @@ our $pathQuery = q{
 	  FULLPKGPATH,
 	  COMMENT,
 	  DESCRIPTION,
-          HOMEPAGE
+	  HOMEPAGE
     FROM %s
     WHERE FULLPKGPATH = ?;
 };

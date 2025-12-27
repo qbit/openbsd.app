@@ -6,6 +6,7 @@ mkdir -p /tmp/openbsd_app/{stable,current}
 
 CURRENT_VER="7.54"
 STABLE_VER="7.52"
+ARCHES=aarch64 arm i386 mips64 powerpc powerpc64 riscv64 sparc64
 CURRENT_FILE=${1:-/tmp/openbsd_app/current/share/sqlports}
 STABLE_FILE=${2:-/tmp/openbsd_app/stable/share/sqlports}
 SIGNIFY="${SIGNIFY:-signify}"
@@ -28,7 +29,8 @@ STABLE_PUB=$(readlink -f /etc/signify/openbsd-78-pkg.pub)
 	tar -C . -zxvf sqlports-${STABLE_VER}.tgz
 )
 
-SQL=$(cat <<EOF
+SQL=$(
+	cat <<EOF
 	ATTACH DATABASE '%s' AS ports;
 
 	CREATE VIRTUAL TABLE
@@ -69,8 +71,8 @@ else
 	# dev mode
 	rm -f ~/src/openbsd.app/combined.db
 	printf "$SQL\n" ${CURRENT_FILE} \
-		"current_ports_fts" \
-		"current_ports_fts" | sqlite3 ~/src/openbsd.app/combined.db
+		"current_ports_fts" \'
+	"current_ports_fts" | sqlite3 ~/src/openbsd.app/combined.db
 	printf "$SQL\n" ${STABLE_FILE} \
 		"stable_ports_fts" \
 		"stable_ports_fts" | sqlite3 ~/src/openbsd.app/combined.db

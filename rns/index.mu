@@ -27,7 +27,7 @@ Search: `B444`<search`>`b
 
 --
 
-Welcome! Default search queries OpenBSD 7.7 package sets.
+Welcome! Default search queries OpenBSD 7.8 package sets.
 
 --
 
