@@ -6,7 +6,7 @@ mkdir -p /tmp/openbsd_app/{stable,current}
 
 CURRENT_VER="7.54"
 STABLE_VER="7.52"
-ARCHES=aarch64 arm i386 mips64 powerpc powerpc64 riscv64 sparc64
+ARCHES="aarch64 arm i386 mips64 powerpc powerpc64 riscv64 sparc64"
 CURRENT_FILE=${1:-/tmp/openbsd_app/current/share/sqlports}
 STABLE_FILE=${2:-/tmp/openbsd_app/stable/share/sqlports}
 SIGNIFY="${SIGNIFY:-signify}"
