@@ -265,7 +265,7 @@ __DATA__
       <h3><a href="/">OpenBSD.app - search packages</a></h3>
       %= form_for '/' => begin
         %= label_for search => 'Search', class => 'none'
-        %= search_field 'search', id => 'search', placeholder => 'Search', value => undef
+        %= search_field 'search', id => 'search', placeholder => 'Search', value => undef, autofocus => undef
         %= check_box 'current', id => 'current', role => "switch"
         %= label_for current => "Search -current"
         (<%= $mtime %>)
