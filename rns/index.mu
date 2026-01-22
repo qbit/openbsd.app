@@ -64,7 +64,7 @@ OpenBSD.app © 2022-<%= $year %> - proudly hosted on obsda.ms ( https://openbsd.
 
 Prefer the CLI? Check out https://codeberg.org/qbit/pkg , which offers the same capabilities as this site.
 
-Made with <3 by qbit | Buy me a coffee ( https://buymeacoffee.com/qbit )!
+Made with <3 by qbit (`[lxmf@745a11b819e01a722cd59ddf74c4b2bf]) | Buy me a coffee ( https://buymeacoffee.com/qbit )!
 RESULT
 
 my $year = (localtime)[5] + 1900;
